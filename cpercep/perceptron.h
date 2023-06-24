@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct perceptron_t {
     int training_epoch_count;
@@ -18,6 +19,7 @@ perceptron_t *init_perceptron(const int input_count, double (*activation_functio
 void destroy_perceptron(perceptron_t *p);
 
 double sign_activation_function(double x);
+double sigmoid_activation(double x);
 
 double perceptron_feedforward(perceptron_t *p, const double training_features[]);
 

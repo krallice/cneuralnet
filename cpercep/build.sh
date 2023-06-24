@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc main.c perceptron.c -o main
+gcc main.c perceptron.c -lm mlp.c -o main

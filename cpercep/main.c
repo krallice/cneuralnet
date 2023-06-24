@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "perceptron.h"
+#include "mlp.h"
 
 void model_x_gt_9(void) {
 
@@ -75,7 +76,7 @@ void model_linear(void) {
             training_labels[i] == 1 ? "above" : "below");
     }
 
-    perceptron_t *p = init_perceptron(2, sign_activation_function, 100000);
+    perceptron_t *p = init_perceptron(2, sign_activation_function, 100);
 
     train_perceptron(p, feature_count, 2, training_features, training_labels, 0.1);
 
@@ -138,6 +139,25 @@ void model_AND(void) {
     return;
 }
 
+void model_XOR(void) {
+
+    // Modelling logical XOR:
+    const double training_features[][2] = {
+        {0, 0}, {0, 1}, {1, 0}, {1, 1}
+    };
+    const double training_labels[] = {
+        -1, 1, 1, -1
+    };
+    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
+    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+
+    multilayer_perceptron_t *mlp = init_mlp(2, 2, 2, 100);
+
+    train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.1);
+
+    destroy_mlp(mlp);
+}
+
 int main(void) {
 
     // Random Seed:
@@ -150,7 +170,9 @@ int main(void) {
     //model_AND();
 
     // A dual input perceptron, trained on a linear equation:
-    model_linear();
+    // model_linear();
+
+    model_XOR();
 
     return 0;
 }
