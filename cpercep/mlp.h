@@ -16,11 +16,6 @@ typedef struct multilayer_perceptron_t {
 
     // MLP Input:
     int input_count;
-     
-    // Input layer:
-    int p_input_count;
-    perceptron_t **p_input;
-    double *p_input_output;
     
     // Hidden layer:
     int p_hidden1_count;
