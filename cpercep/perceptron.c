@@ -37,6 +37,12 @@ double sigmoid_activation(double x) {
     return 1 / (1 + exp(-x));
 }
 
+// Rectified Linear Unit:
+// Nice properties from it being close to linear (todo: describe why later)
+double relu_activation(double x) {
+    return x > 0 ? x : 0;
+}
+
 double perceptron_feedforward(perceptron_t *p, const double training_features[]) {
     // Weighted sum up all training features, and run it through our activation function.
     // As the bias input is always 1, we can just start off straight with the bias value:

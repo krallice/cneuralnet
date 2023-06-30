@@ -18,8 +18,10 @@ typedef struct perceptron_t {
 perceptron_t *init_perceptron(const int input_count, double (*activation_function)(double), int training_epoch_count);
 void destroy_perceptron(perceptron_t *p);
 
+// Activation functions:
 double sign_activation_function(double x);
 double sigmoid_activation(double x);
+double relu_activation(double x);
 
 double perceptron_feedforward(perceptron_t *p, const double training_features[]);
 
