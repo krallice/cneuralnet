@@ -45,7 +45,9 @@ double relu_activation(double x) {
 
 double perceptron_feedforward(perceptron_t *p, const double training_features[]) {
     // Weighted sum up all training features, and run it through our activation function.
-    // As the bias input is always 1, we can just start off straight with the bias value:
+    // As the bias input is always 1, we can just start off straight with the bias value.
+    // If you were to consider a vector of weights W, a vector of inputs I, and the bias term b, this would be equivalent to algebraic equation W dot I + b (vector dot product)
+    // The output of this is ran through the activation function which non-linearly squishes or transforms the input into an output space
     double weighted_sum = p->bias_weight;
     for (int i = 0; i < p->input_count; i++) {
         weighted_sum += training_features[i] * p->weights[i];
