@@ -1,5 +1,9 @@
 #include "perceptron.h"
 
+// ////////////////////////////////////  //
+//            Create/Destroy             //
+//  ///////////////////////////////////  //
+
 perceptron_t *init_perceptron(const int input_count, double (*activation_function)(double), int training_epoch_count) {
     
     // Init and zeroise:
@@ -29,6 +33,10 @@ void destroy_perceptron(perceptron_t *p) {
     return;
 }
 
+// ////////////////////////////////////  //
+//        Activation Functions           //
+//  ///////////////////////////////////  //
+
 double sign_activation_function(double x) {
     return x < 0 ? -1 : 1;
 }
@@ -43,6 +51,10 @@ double relu_activation(double x) {
     return x > 0 ? x : 0;
 }
 
+// ////////////////////////////////////  //
+//               Predict                 //
+//  ///////////////////////////////////  //
+
 double perceptron_feedforward(perceptron_t *p, const double training_features[]) {
     // Weighted sum up all training features, and run it through our activation function.
     // As the bias input is always 1, we can just start off straight with the bias value.
@@ -55,6 +67,10 @@ double perceptron_feedforward(perceptron_t *p, const double training_features[])
     return p->activation_function(weighted_sum);
 }
 
+// ////////////////////////////////////  //
+//            Training Loop              //
+//  ///////////////////////////////////  //
+
 void train_perceptron(perceptron_t *p, int row_count, int column_count, const double training_features[row_count][column_count], const double training_labels[row_count], const double learning_rate) {
 
     // Exit if trying to train based on more features than expected:
@@ -63,31 +79,35 @@ void train_perceptron(perceptron_t *p, int row_count, int column_count, const do
         return;
     }
 
+    // Iterate over the dataset training_epoch_count times:
     for (int epoch = 0; epoch < p->training_epoch_count; epoch++) {
-        // Foreach dataset:
+        
+        // Foreach entry in the total dataset:
         for (int i = 0; i < row_count; i++) {
             
-            // Create a prediction for that dataset:
+            // Create a prediction for this particular vector of features:
             double prediction = perceptron_feedforward(p, training_features[i]);
 
             // Adjust the weights, aka train the model:
 
-            // First of all, calculate the error. That is to say,
-            // how far off was the predicted label from the correct label?
-            // Predicted, Correct, Error
-            //  1    1    0 (correct response)
-            //  1   -1    -2 (incorrect, was a false positive)
-            // -1    1    2 (incorrect. was a false negative)
-            // -1   -1    0 (correct response)
+            // First calculate the error difference (Difference in expected/predicted values):
+            // Predicted    Correct     Error
+            //  1            1       0 (correct response)
+            //  1           -1      -2 (incorrect, was a false positive)
+            // -1            1       2 (incorrect. was a false negative)
+            // -1           -1       0 (correct response)
             double error_difference = training_labels[i] - prediction;
 
-            // Nudge the bias weight in the direction of the error difference.
-            // Use the learning_rate as a magic scalar that scales how drastically the weight is nudged. Lower values mean slower responses to training (but more stable):
+            // Now, adjust the weights, using the following formula:
+            // w = w + (learning_rate * error_difference * correct_answer)
+            // This formula nudges the weight vector components in the direction of the training features
+            // Use the learning_rate as a magic scalar that scales how drastically the weight is nudged. Lower values mean slower responses to training (but more stable).
+            
+            // First address the bias (same formula, just treating correct_answer as 1):
             p->bias_weight += learning_rate * error_difference;
-
+            
             // Nudge the rest of the input weights in the same way:
             for (int j = 0; j < p->input_count; j++) {
-
                 p->weights[j] += learning_rate * error_difference * training_features[i][j];
             }
         }
