@@ -61,4 +61,109 @@ Starting prediction test from x = -15 to 15
 [ 28/30 SUCCESS ]: Input:  12 Expected:  1 Prediction:  1
 [ 29/30 SUCCESS ]: Input:  13 Expected:  1 Prediction:  1
 [ 30/30 SUCCESS ]: Input:  14 Expected:  1 Prediction:  1
+
+# ./build.sh && ./main model_linear
+
+[ DETAILS ]
+Model: model_linear
+Aim: Train a neuron to linearly separate input vector x in R2 against equation: y = x/2 + 5
+Architecture: Single Perceptron
+Input: A two dimensional input vector, x
+        - x_1: Input value, mapped conceptually to the x axis
+        - x_2: Input value, mapped conceptually to the y axis
+Activation: Sign Activation Function
+Loss Function: Perceptron Learning Rule
+        (weight = weight + (learning_rate)(error := correct - predicted)(input))
+Training Strategy:
+        Training data randomly generated of 50 entries, with domain: (-20 <= x <= 20) and range (-20 <= x <= 20)
+        Perceptron trained with 100 epochs of the dataset.
+
+
+[ GENERATE TRAINING DATA ]
+Generated Random Point (1/50): (x,y): (-7, 2). Point is above the line.
+Generated Random Point (2/50): (x,y): (18, 20). Point is above the line.
+Generated Random Point (3/50): (x,y): (17, -13). Point is below the line.
+Generated Random Point (4/50): (x,y): (1, 18). Point is above the line.
+Generated Random Point (5/50): (x,y): (4, -11). Point is below the line.
+Generated Random Point (6/50): (x,y): (-7, 5). Point is above the line.
+Generated Random Point (7/50): (x,y): (0, -6). Point is below the line.
+Generated Random Point (8/50): (x,y): (-14, 10). Point is above the line.
+Generated Random Point (9/50): (x,y): (-4, -8). Point is below the line.
+Generated Random Point (10/50): (x,y): (-20, -12). Point is below the line.
+Generated Random Point (11/50): (x,y): (-19, -18). Point is below the line.
+Generated Random Point (12/50): (x,y): (-17, -3). Point is above the line.
+Generated Random Point (13/50): (x,y): (-20, -20). Point is below the line.
+Generated Random Point (14/50): (x,y): (-13, 18). Point is above the line.
+Generated Random Point (15/50): (x,y): (7, 14). Point is above the line.
+Generated Random Point (16/50): (x,y): (-8, 20). Point is above the line.
+Generated Random Point (17/50): (x,y): (-5, -11). Point is below the line.
+Generated Random Point (18/50): (x,y): (-20, -7). Point is below the line.
+Generated Random Point (19/50): (x,y): (-1, 4). Point is above the line.
+Generated Random Point (20/50): (x,y): (-8, -18). Point is below the line.
+Generated Random Point (21/50): (x,y): (13, 7). Point is below the line.
+Generated Random Point (22/50): (x,y): (8, -8). Point is below the line.
+Generated Random Point (23/50): (x,y): (-20, 14). Point is above the line.
+Generated Random Point (24/50): (x,y): (-18, -3). Point is above the line.
+Generated Random Point (25/50): (x,y): (-12, -16). Point is below the line.
+Generated Random Point (26/50): (x,y): (5, -11). Point is below the line.
+Generated Random Point (27/50): (x,y): (-11, 10). Point is above the line.
+Generated Random Point (28/50): (x,y): (6, -11). Point is below the line.
+Generated Random Point (29/50): (x,y): (10, 15). Point is above the line.
+Generated Random Point (30/50): (x,y): (-12, -4). Point is below the line.
+Generated Random Point (31/50): (x,y): (8, 3). Point is below the line.
+Generated Random Point (32/50): (x,y): (-3, -16). Point is below the line.
+Generated Random Point (33/50): (x,y): (12, 0). Point is below the line.
+Generated Random Point (34/50): (x,y): (-1, -10). Point is below the line.
+Generated Random Point (35/50): (x,y): (-17, 11). Point is above the line.
+Generated Random Point (36/50): (x,y): (-5, 18). Point is above the line.
+Generated Random Point (37/50): (x,y): (0, -18). Point is below the line.
+Generated Random Point (38/50): (x,y): (-8, 0). Point is below the line.
+Generated Random Point (39/50): (x,y): (18, -6). Point is below the line.
+Generated Random Point (40/50): (x,y): (19, -15). Point is below the line.
+Generated Random Point (41/50): (x,y): (0, 5). Point is above the line.
+Generated Random Point (42/50): (x,y): (-4, 9). Point is above the line.
+Generated Random Point (43/50): (x,y): (-3, -16). Point is below the line.
+Generated Random Point (44/50): (x,y): (-20, -14). Point is below the line.
+Generated Random Point (45/50): (x,y): (19, -12). Point is below the line.
+Generated Random Point (46/50): (x,y): (5, 9). Point is above the line.
+Generated Random Point (47/50): (x,y): (11, -17). Point is below the line.
+Generated Random Point (48/50): (x,y): (15, 5). Point is below the line.
+Generated Random Point (49/50): (x,y): (5, -6). Point is below the line.
+Generated Random Point (50/50): (x,y): (17, 10). Point is below the line.
+
+
+[ TRAINING ]
+Model execution starting now ...
+Training 100 epochs now.
+
+
+[ TRAINING RESULTS ]
+Final weight vector w in R2 (w_0, w_1) = (-3.23, 8.04)
+Final bias value b = -28.65
+This defines an equation: -3.23x + 8.04y + -28.65 = 0
+Re-arranged for y: y = 0.40x + 3.56
+
+
+[ PREDICTION ]
+[ 01/20 SUCCESS ]: Input: (  8, -5) Expected: -1 (Point is below the line) Prediction: -1
+[ 02/20 SUCCESS ]: Input: ( 20,-10) Expected: -1 (Point is below the line) Prediction: -1
+[ 03/20 SUCCESS ]: Input: ( -7, -5) Expected: -1 (Point is below the line) Prediction: -1
+[ 04/20 SUCCESS ]: Input: (-12,  0) Expected:  1 (Point is above the line) Prediction:  1
+[ 05/20 SUCCESS ]: Input: ( 15, 14) Expected:  1 (Point is above the line) Prediction:  1
+[ 06/20 SUCCESS ]: Input: ( 17,  4) Expected: -1 (Point is below the line) Prediction: -1
+[ 07/20 SUCCESS ]: Input: (-10,-20) Expected: -1 (Point is below the line) Prediction: -1
+[ 08/20 SUCCESS ]: Input: (  4, -2) Expected: -1 (Point is below the line) Prediction: -1
+[ 09/20 SUCCESS ]: Input: (-20, 14) Expected:  1 (Point is above the line) Prediction:  1
+[ 10/20 SUCCESS ]: Input: (-16, 11) Expected:  1 (Point is above the line) Prediction:  1
+[ 11/20 SUCCESS ]: Input: (  7,-10) Expected: -1 (Point is below the line) Prediction: -1
+[ 12/20 SUCCESS ]: Input: (  6, -9) Expected: -1 (Point is below the line) Prediction: -1
+[ 13/20 SUCCESS ]: Input: ( 17,-19) Expected: -1 (Point is below the line) Prediction: -1
+[ 14/20 SUCCESS ]: Input: (-13,  7) Expected:  1 (Point is above the line) Prediction:  1
+[ 15/20 SUCCESS ]: Input: (-11,  1) Expected:  1 (Point is above the line) Prediction:  1
+[ 16/20 SUCCESS ]: Input: ( -6, 18) Expected:  1 (Point is above the line) Prediction:  1
+[ 17/20 SUCCESS ]: Input: ( 16, -5) Expected: -1 (Point is below the line) Prediction: -1
+[ 18/20 SUCCESS ]: Input: (-13,-12) Expected: -1 (Point is below the line) Prediction: -1
+[ 19/20 SUCCESS ]: Input: ( 10, -3) Expected: -1 (Point is below the line) Prediction: -1
+[ 20/20 SUCCESS ]: Input: ( 11,  6) Expected: -1 (Point is below the line) Prediction: -1
+
 ```
