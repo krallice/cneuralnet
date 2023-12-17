@@ -63,8 +63,6 @@ void model_x_gt_9(void) {
 
     printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
     printf("Final weight vector w in R2 (w_0, w_1) = (%f, %f)\n", p->weights[0], p->bias_weight);
-    // printf("\t- w_0 weight vector adjusting x_0\n");
-    // printf("\t- w_1 weight vector adjusting bias value of 1\n");
     printf("Vector w is a normal vector to a hyperplane/vector subspace defined by: %.2fx + %.2fy = 0\n", p->weights[0], p->bias_weight);
     printf("The hyperplane crosses y = 1 at x = %.2f\n", ((- p->bias_weight) / p->weights[0]));
     printf("\t(y = 1 is important as all input vectors sit at (x=x,y=1) due to the bias term lifting the one dimensional input vectors consisting of x_0 into R2)\n");
@@ -83,7 +81,9 @@ void model_x_gt_9(void) {
         double expected_value = i > 9 ? 1 : -1;
         //printf("[ %02d/30 %s ]: Input:%d Expected:%0.0f Prediction:%0.0f\n", c++, expected_value == prediction ? "SUCCESS" : "FAILURE", i, expected_value, prediction);
         //printf("STATUS: %s Feature: %d Prediction: %f\n", expected_value == prediction ? "SUCCESS" : "FAILURE", i, prediction);
-        printf("[ %s%02d/30 %s%s ]: Input: %3d Expected: %2.0f Prediction: %2.0f\n", expected_value == prediction ? GREEN : RED, c++, expected_value == prediction ? "SUCCESS" : "FAILURE", RESET, i, expected_value, prediction);
+        printf("[ %s%02d/30 %s%s ]: Input: %3d Expected: %2.0f Prediction: %2.0f\n", 
+            expected_value == prediction ? GREEN : RED, c++, expected_value == prediction ? "SUCCESS" : "FAILURE", RESET, 
+            i, expected_value, prediction);
     }
 
     destroy_perceptron(p);
@@ -192,19 +192,48 @@ void model_AND(void) {
     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
 
+    printf("\n");
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: model_AND\n");
+    printf("Aim: Train a neuron to model an AND gate, acting against an input vector x in R2\n");
+    printf("Architecture: Single Perceptron\n");
+    printf("Input: A two dimensional input vector, x\n");
+    printf("\t- x_1: Input value, mapped conceptually to the x axis\n");
+    printf("\t- x_2: Input value, mapped conceptually to the y axis\n");
+    printf("Activation: Sign Activation Function\n");
+    printf("Loss Function: Perceptron Learning Rule\n\t(weight = weight + (learning_rate)(error := correct - predicted)(input))\n");
+
+    printf("Training Strategy:\n");
+    printf("\tPerceptron trained with 100 epochs of the entire truth table of an AND gate.\n");
+    
     perceptron_t *p = init_perceptron(training_columns, sign_activation_function, 100);
+
+    printf("\n\n");
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training 100 epochs now.\n");
 
     train_perceptron(p, training_rows, training_columns, training_features, training_labels, 0.1);
 
-    for (int i = 0; i < training_rows; i++) {
-        double prediction = perceptron_feedforward(p, training_features[i]);
-        printf("ValueA: %0.1f ValueB: %0.1f Expected: %0.1f Prediction: %0.1f\n", training_features[i][0], training_features[i][1], 
-            (double)((int)training_features[i][0] & (int)training_features[i][1]), (prediction + 1) * 0.5);
-    }
+    printf("\n\n");
+    printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    printf("Final weight vector w in R2 (w_0, w_1) = (%0.2f, %0.2f)\n", p->weights[0], p->weights[1]);
+    printf("Final bias value b = %0.2f\n", p->bias_weight);
+    printf("This defines an equation: %.2fx + %.2fy + %.2f = 0\n", p->weights[0], p->weights[1], p->bias_weight);
+    printf("Re-arranged for y: y = %.2fx + %.2f\n", ((- p->weights[0])/ p->weights[1]), ((- p->bias_weight)/ p->weights[1]));
+    printf("\n\n");
 
-    // Dump state:
-    printf("Perceptron Bias: %f\n", p->bias_weight);
-    printf("Perceptron Weight: %f\n", p->weights[0]);
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+    for (int i = 0; i < training_rows; i++) {
+
+        double correct_result = (double)((int)training_features[i][0] & (int)training_features[i][1]) == 0 ? -1 : 1;
+        double prediction = perceptron_feedforward(p, training_features[i]);
+
+        printf("[ %s%02d/04 %s%s ]: Input: (%2.f, %2.f) Expected: %2.f Prediction: %2.f\n", 
+            (correct_result == prediction) ? GREEN : RED,
+            i + 1, (correct_result == prediction) ? "SUCCESS" : "ERROR  ", RESET,
+            training_features[i][0], training_features[i][1], i + 1, correct_result, prediction);
+    }
 
     destroy_perceptron(p);
     return;
