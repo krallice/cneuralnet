@@ -232,7 +232,7 @@ void model_AND(void) {
         printf("[ %s%02d/04 %s%s ]: Input: (%2.f, %2.f) Expected: %2.f Prediction: %2.f\n", 
             (correct_result == prediction) ? GREEN : RED,
             i + 1, (correct_result == prediction) ? "SUCCESS" : "ERROR  ", RESET,
-            training_features[i][0], training_features[i][1], i + 1, correct_result, prediction);
+            training_features[i][0], training_features[i][1], correct_result, prediction);
     }
 
     destroy_perceptron(p);
