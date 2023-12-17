@@ -92,14 +92,32 @@ void model_x_gt_9(void) {
 
 void model_linear(void) {
     
-    const int feature_count = 20;
+    const int feature_count = 50;
     const int point_lower_bound = -20;
     const int point_upper_bound = 20;
 
     double training_features[feature_count][2];
     double training_labels[feature_count];
 
-    // Generate the test data:
+    printf("\n");
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: model_linear\n");
+    printf("Aim: Train a neuron to linearly separate input vector x in R2 against equation: y = x/2 + 5\n");
+    printf("Architecture: Single Perceptron\n");
+    printf("Input: A two dimensional input vector, x\n");
+    printf("\t- x_1: Input value, mapped conceptually to the x axis\n");
+    printf("\t- x_2: Input value, mapped conceptually to the y axis\n");
+    printf("Activation: Sign Activation Function\n");
+    printf("Loss Function: Perceptron Learning Rule\n\t(weight = weight + (learning_rate)(error := correct - predicted)(input))\n");
+
+    printf("Training Strategy:\n");
+    printf("\tTraining data randomly generated of %d entries, with domain: (%d <= x <= %d) and range (%d <= x <= %d)\n", 
+        feature_count, point_lower_bound, point_upper_bound, point_lower_bound, point_upper_bound);
+    printf("\tPerceptron trained with 100 epochs of the dataset.\n");
+    
+    printf("\n\n");
+
+    printf("[ %sGENERATE TRAINING DATA%s ]\n", YELLOW, RESET);
     for (int i = 0; i < feature_count; i++) {
 
         // x co-ord:
@@ -117,14 +135,24 @@ void model_linear(void) {
             training_labels[i] == 1 ? "above" : "below");
     }
 
+    printf("\n\n");
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training 100 epochs now.\n");
     perceptron_t *p = init_perceptron(2, sign_activation_function, 100);
-
     train_perceptron(p, feature_count, 2, training_features, training_labels, 0.1);
 
-    printf("=== End Training ===\n");
+    printf("\n\n");
+    printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    printf("Final weight vector w in R2 (w_0, w_1) = (%0.2f, %0.2f)\n", p->weights[0], p->weights[1]);
+    printf("Final bias value b = %0.2f\n", p->bias_weight);
+    printf("This defines an equation: %.2fx + %.2fy + %.2f = 0\n", p->weights[0], p->weights[1], p->bias_weight);
+    printf("Re-arranged for y: y = %.2fx + %.2f\n", ((- p->weights[0])/ p->weights[1]), ((- p->bias_weight)/ p->weights[1]));
 
+    printf("\n\n");
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
     const int predict_count = 20;
-    for (int i = 0; i < predict_count; i++) {
+    for (int i = 1; i <= predict_count; i++) {
 
         double predict_features[2];
         int predict_feature_label;
@@ -140,10 +168,12 @@ void model_linear(void) {
 
         double prediction = perceptron_feedforward(p, predict_features);
 
-        printf("Point (%d,%d) is %s the line. Prediction was: %s\n", 
-        (int)predict_features[0], (int)predict_features[1], (predict_feature_label == 1) ? "above" : "below",
-        (predict_feature_label == prediction) ? "CORRECT" : "xx Incorrect xx");
-
+        printf("[ %s%02d/%d %s%s ]: Input: (%3d,%3d) Expected: %2d (Point is %s the line) Prediction: %2.0f\n", 
+            (predict_feature_label == prediction) ? GREEN : RED,
+            i, predict_count, 
+            (predict_feature_label == prediction) ? "SUCCESS" : "ERROR  ", RESET,
+            (int)predict_features[0], (int)predict_features[1], predict_feature_label, 
+            (predict_feature_label == 1) ? "above" : "below", prediction);
     }
 
     destroy_perceptron(p);
@@ -202,9 +232,9 @@ void model_XOR(void) {
 // Array of model mappings
 ModelMapping modelMappings[] = {
     {"model_x_gt_9", "A single dimensional input to a single perceptron, trained on the dataset of x > 9", model_x_gt_9},
-    {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
     {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
-    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR},
+    {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
+    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR}
 };
 
 int main(int argc, char *argv[]) {
