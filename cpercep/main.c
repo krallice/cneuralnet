@@ -6,6 +6,11 @@
 #include "perceptron.h"
 #include "mlp.h"
 
+#define RED "\x1b[31m"
+#define GREEN "\x1b[32m"
+#define YELLOW "\x1b[33m"
+#define RESET "\x1b[0m"
+
 // Structure to map model names to functions
 typedef struct {
     char *modelName;
@@ -29,28 +34,57 @@ void model_x_gt_9(void) {
 
     perceptron_t *p = init_perceptron(1, sign_activation_function, 1000);
 
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: model_x_gt_9\n");
+    printf("Aim: Train a neuron to fire when input vector x_1 > 9\n");
+    printf("Architecture: Single Perceptron\n");
+    printf("Input: A one dimensional input vector, x\n");
+    printf("\t- x_1: Input value\n");
+    printf("Activation: Sign Activation Function\n");
+    printf("Loss Function: Perceptron Learning Rule\n\t(weight = weight + (learning_rate)(error := correct - predicted)(input))\n");
+
+    printf("Training Strategy:\n");
+    printf("\t1000 epochs of correctly labeled integers 0 -> 19 inclusive. No rational/fractional numbers, integers only.\n");
+    printf("\tExpected outcome is a normal vector that defines a hyperplane that seperates a two dimensional vector space based on the x value being < 9.\n");
+    
+    printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training 1000 epochs now.\n");
+
     train_perceptron(p, training_rows, training_columns, training_features, training_labels, 0.1);
 
+    printf("Training complete.\n");
+
+    printf("\n\n");
+
+    printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    printf("Final weight vector w in R2 (w_0, w_1) = (%f, %f)\n", p->weights[0], p->bias_weight);
+    // printf("\t- w_0 weight vector adjusting x_0\n");
+    // printf("\t- w_1 weight vector adjusting bias value of 1\n");
+    printf("Vector w is a normal vector to a hyperplane/vector subspace defined by: %.2fx + %.2fy = 0\n", p->weights[0], p->bias_weight);
+    printf("The hyperplane crosses y = 1 at x = %.2f\n", ((- p->bias_weight) / p->weights[0]));
+    printf("\t(y = 1 is important as all input vectors sit at (x=x,y=1) due to the bias term lifting the one dimensional input vectors consisting of x_0 into R2)\n");
+    printf("The perceptron will only fire for values that are >= %.2f\n", ((- p->bias_weight) / p->weights[0]));
+
+    printf("\n\n");
+
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+    printf("Starting prediction test from x = -15 to 15\n");
+
     // Predict and check:
-    for (int i = -30; i < 31; i++) {
+    int c = 1;
+    for (int i = -15; i <= 14; i++) {
         const double prediction_features[] = {i};
         double prediction = perceptron_feedforward(p, prediction_features);
         double expected_value = i > 9 ? 1 : -1;
-        printf("STATUS: %s Feature: %d Prediction: %f\n", expected_value == prediction ? "SUCCESS" : "FAILURE", i, prediction);
+        //printf("[ %02d/30 %s ]: Input:%d Expected:%0.0f Prediction:%0.0f\n", c++, expected_value == prediction ? "SUCCESS" : "FAILURE", i, expected_value, prediction);
+        //printf("STATUS: %s Feature: %d Prediction: %f\n", expected_value == prediction ? "SUCCESS" : "FAILURE", i, prediction);
+        printf("[ %s%02d/30 %s%s ]: Input: %3d Expected: %2.0f Prediction: %2.0f\n", expected_value == prediction ? GREEN : RED, c++, expected_value == prediction ? "SUCCESS" : "FAILURE", RESET, i, expected_value, prediction);
     }
-
-    // // Predict and check, non-integer shows the limitation
-    // // of a single perceptron trained on integers
-    // for (double i = 8; i < 10; i += 0.1) {
-    //     const double prediction_features[] = {i};
-    //     double prediction = perceptron_feedforward(p, prediction_features);
-    //     double expected_value = i > 9 ? 1 : -1;
-    //     printf("STATUS: %s Feature: %f Prediction: %f\n", expected_value == prediction ? "SUCCESS" : "FAILURE", i, prediction);
-    // }
-
-    // Dump state:
-    printf("Perceptron Bias: %f\n", p->bias_weight);
-    printf("Perceptron Weight: %f\n", p->weights[0]);
 
     destroy_perceptron(p);
     return;
