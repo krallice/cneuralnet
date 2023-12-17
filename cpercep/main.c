@@ -6,6 +6,13 @@
 #include "perceptron.h"
 #include "mlp.h"
 
+// Structure to map model names to functions
+typedef struct {
+    char *modelName;
+    char *description;
+    void (*function)();
+} ModelMapping;
+
 void model_x_gt_9(void) {
 
     // Modelling x > 9:
@@ -158,21 +165,46 @@ void model_XOR(void) {
     destroy_mlp(mlp);
 }
 
-int main(void) {
+// Array of model mappings
+ModelMapping modelMappings[] = {
+    {"model_x_gt_9", "A single dimensional input to a single perceptron, trained on the dataset of x > 9", model_x_gt_9},
+    {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
+    {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
+    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR},
+};
+
+int main(int argc, char *argv[]) {
 
     // Random Seed:
     srand(time(NULL)); 
 
-    // A single input perceptron, trained on the dataset of x > 9:
-    // model_x_gt_9();
+    if (argc < 2) {
+        printf("Usage: %s <modelName>\n", argv[0]);
+        printf("Valid models:\n");
+        for (int i = 0; i < sizeof(modelMappings) / sizeof(modelMappings[0]); i++) {
+            printf("- %s - %s\n", modelMappings[i].modelName, modelMappings[i].description);
+        }
+        return 1;
+    }
 
-    // A dual input perceptron, trained to operate as an AND gate:
-    //model_AND();
+    char *modelName = argv[1];
+    void (*selectedFunction)() = NULL;
+    for (int i = 0; i < sizeof(modelMappings) / sizeof(modelMappings[0]); i++) {
+        if (strcmp(modelName, modelMappings[i].modelName) == 0) {
+            selectedFunction = modelMappings[i].function;
+            break;
+        }
+    }
 
-    // A dual input perceptron, trained on a linear equation:
-    // model_linear();
-
-    model_XOR();
-
+    if (selectedFunction != NULL) {
+        selectedFunction();
+    } else {
+        printf("Invalid model name: %s\n", modelName);
+        printf("Valid models:\n");
+        for (int i = 0; i < sizeof(modelMappings) / sizeof(modelMappings[0]); i++) {
+            printf("- %s - %s\n", modelMappings[i].modelName, modelMappings[i].description);
+        }
+        return 1;
+    }
     return 0;
 }
