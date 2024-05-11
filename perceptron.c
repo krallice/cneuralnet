@@ -34,21 +34,43 @@ void destroy_perceptron(perceptron_t *p) {
 }
 
 // ////////////////////////////////////  //
-//        Activation Functions           //
+//     Non-Differentiable Activation     //
+//               Functions               //
 //  ///////////////////////////////////  //
+
+// These activation functions are not differentiable, and are used for the perceptron model,
+// which consists of a single node; therefore backpropegation is not required (which relies on the derivative of the activation function to calculate the gradient of the loss function).
 
 double sign_activation_function(double x) {
     return x < 0 ? -1 : 1;
 }
 
+// ////////////////////////////////////  //
+//         Differentiable Activation     //
+//               Functions               //
+//  ///////////////////////////////////  //
+
+// The following activation functions are used in neural networks, where backpropegation is required to calculate the gradient of the loss function.
+
+// Rectified Linear Unit:
+// Nice properties from it being close to linear (TODO: describe why later)
+double relu_activation(double x) {
+    return x > 0 ? x : 0;
+}
+
+double derivative_relu_activation(double x) {
+    return x > 0 ? 1 : 0;
+}
+
+// Sigmoid
+// TOOD: Describe properties later
+
 double sigmoid_activation(double x) {
     return 1 / (1 + exp(-x));
 }
 
-// Rectified Linear Unit:
-// Nice properties from it being close to linear (todo: describe why later)
-double relu_activation(double x) {
-    return x > 0 ? x : 0;
+double derivative_sigmoid_activation(double x) {
+    return sigmoid_activation(x) * (1 - sigmoid_activation(x));
 }
 
 // ////////////////////////////////////  //

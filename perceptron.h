@@ -20,11 +20,14 @@ void destroy_perceptron(perceptron_t *p);
 
 // Activation functions:
 double sign_activation_function(double x);
-double sigmoid_activation(double x);
+
 double relu_activation(double x);
+double derivative_relu_activation(double x);
+
+double sigmoid_activation(double x);
+double derivative_sigmoid_activation(double x);
 
 // For use in single node networks (singleton perceptron):
-
 // Activate the perceptron, and return the result:
 double perceptron_feedforward(perceptron_t *p, const double training_features[]);
 // Used for single node networks:
