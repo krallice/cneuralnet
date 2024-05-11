@@ -1,6 +1,7 @@
 #include "mlp.h"
 
-multilayer_perceptron_t *init_mlp(int p_input_count, int p_hidden1_count, int p_output_count, int epoch_count) {
+multilayer_perceptron_t *init_mlp(int p_input_count, int p_hidden1_count, int p_output_count, 
+    double (*hidden1_activation_function)(double), double (*output_activation_function)(double), int epoch_count) {
 
     // Init and zeroise:
     multilayer_perceptron_t *mlp = (multilayer_perceptron_t*)malloc(sizeof(multilayer_perceptron_t));
@@ -19,11 +20,11 @@ multilayer_perceptron_t *init_mlp(int p_input_count, int p_hidden1_count, int p_
     mlp->p_output = malloc(mlp->p_output_count * sizeof(perceptron_t*));
 
     for (int i = 0; i < mlp->p_hidden1_count; i++) {
-        mlp->p_hidden1[i] = init_perceptron(mlp->input_count, sign_activation_function, 1);
+        mlp->p_hidden1[i] = init_perceptron(mlp->input_count, hidden1_activation_function, 1);
     }
 
     for (int i = 0; i < mlp->p_output_count; i++) {
-        mlp->p_output[i] = init_perceptron(mlp->p_hidden1_count, sign_activation_function, 1);
+        mlp->p_output[i] = init_perceptron(mlp->p_hidden1_count, output_activation_function, 1);
     }
 
     // Init the arrays that hold the output of each stage (to be passed as input into the next stage):

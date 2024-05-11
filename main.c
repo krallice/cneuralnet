@@ -251,7 +251,7 @@ void model_XOR(void) {
     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
 
-    multilayer_perceptron_t *mlp = init_mlp(2, 2, 2, 100);
+    multilayer_perceptron_t *mlp = init_mlp(2, 2, 2, relu_activation, relu_activation, 100);
 
     train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.1);
 
