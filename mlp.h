@@ -19,13 +19,18 @@ typedef struct multilayer_perceptron_t {
     
     // Hidden layer:
     int p_hidden1_count;
-    perceptron_t **p_hidden1;
-    double *p_hidden1_output;
+    double** p_hidden1_weights;
+    double p_hidden1_bias_weight;
 
-    // Output layer:
+    // Hidden layer:
     int p_output_count;
-    perceptron_t **p_output;
-    double *p_output_output;
+    double* p_output_weights;
+    double p_output_bias_weight;
+
+    double (*hidden1_activation_function)(double);
+    double (*hidden1_derivative_activation_function)(double);
+    double (*output_activation_function)(double);
+    double (*output_derivative_activation_function)(double);
     
 } multilayer_perceptron_t;
 
