@@ -32,7 +32,7 @@ void model_x_gt_9(void) {
     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
 
-    perceptron_t *p = init_perceptron(1, sign_activation_function, 1000);
+    perceptron_t *p = init_perceptron(1, sign_activation_function, NULL, 1000);
 
     printf("\n");
 
@@ -139,7 +139,7 @@ void model_linear(void) {
     printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
     printf("Model execution starting now ...\n");
     printf("Training 100 epochs now.\n");
-    perceptron_t *p = init_perceptron(2, sign_activation_function, 100);
+    perceptron_t *p = init_perceptron(2, sign_activation_function, NULL, 100);
     train_perceptron(p, feature_count, 2, training_features, training_labels, 0.1);
 
     printf("\n\n");
@@ -206,7 +206,7 @@ void model_AND(void) {
     printf("Training Strategy:\n");
     printf("\tPerceptron trained with 100 epochs of the entire truth table of an AND gate.\n");
     
-    perceptron_t *p = init_perceptron(training_columns, sign_activation_function, 100);
+    perceptron_t *p = init_perceptron(training_columns, sign_activation_function, NULL, 100);
 
     printf("\n\n");
     printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
@@ -239,31 +239,188 @@ void model_AND(void) {
     return;
 }
 
-void model_XOR(void) {
+// wip:
+// void model_XOR(void) {
 
-    // Modelling logical XOR:
-    const double training_features[][2] = {
-        {0, 0}, {0, 1}, {1, 0}, {1, 1}
+//     // Modelling logical XOR:
+//     const double training_features[][2] = {
+//         {0, 0}, {0, 1}, {1, 0}, {1, 1}
+//     };
+//     const double training_labels[] = {
+//         -1, 1, 1, -1
+//     };
+//     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
+//     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+
+//     multilayer_perceptron_t *mlp = init_mlp(2, 2, 2, relu_activation, relu_activation, 100);
+
+//     train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.1);
+
+//     destroy_mlp(mlp);
+// }
+
+void model_4x2_mlp(void) {
+
+    const double training_features[][1] = {
+        {4}
     };
     const double training_labels[] = {
-        -1, 1, 1, -1
+        8
     };
     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
 
-    multilayer_perceptron_t *mlp = init_mlp(2, 2, 2, relu_activation, relu_activation, 100);
+    /*
+    Simple architecture, consisting of 1 input node, 1 output node, and 1 hidden node.
+    All activation functions are linear, with no shaping
+    Input Layer           Hidden Layer              Output Layer
+          O  -------------->    O     -------------->    O  
+         x_1    ·   w_1  -> (linear activation) ·   w_2  -> (linear activation)      
+    (Input Node)           (Hidden Node)            (Output Node)
+    */
+    multilayer_perceptron_t *mlp = init_mlp(1, 1, 1, linear_activation, derivative_linear_activation, 
+        linear_activation, derivative_linear_activation, 100);
 
-    train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.1);
+    printf("\n");
+
+    // printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    // printf("Model: model_x_gt_9\n");
+    // printf("Aim: Train a neuron to fire when input vector x_1 > 9\n");
+    // printf("Architecture: Single Perceptron\n");
+    // printf("Input: A one dimensional input vector, x\n");
+    // printf("\t- x_1: Input value\n");
+    // printf("Activation: Sign Activation Function\n");
+    // printf("Loss Function: Perceptron Learning Rule\n\t(weight = weight + (learning_rate)(error := correct - predicted)(input))\n");
+
+    // printf("Training Strategy:\n");
+    // printf("\t1000 epochs of correctly labeled integers 0 -> 19 inclusive. No rational/fractional numbers, integers only.\n");
+    // printf("\tExpected outcome is a normal vector that defines a hyperplane that seperates a two dimensional vector space based on the x value being < 9.\n");
+    
+    // printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training 1000 epochs now.\n");
+
+    train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.01);
+
+    printf("Training complete.\n");
+
+    printf("\n\n");
+
+    // printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    // printf("Final weight vector w in R2 (w_0, w_1) = (%f, %f)\n", p->weights[0], p->bias_weight);
+    // printf("Vector w is a normal vector to a hyperplane/vector subspace defined by: %.2fx + %.2fy = 0\n", p->weights[0], p->bias_weight);
+    // printf("The hyperplane crosses y = 1 at x = %.2f\n", ((- p->bias_weight) / p->weights[0]));
+    // printf("\t(y = 1 is important as all input vectors sit at (x=x,y=1) due to the bias term lifting the one dimensional input vectors consisting of x_0 into R2)\n");
+    // printf("The perceptron will only fire for values that are >= %.2f\n", ((- p->bias_weight) / p->weights[0]));
+
+    printf("\n\n");
+
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+    printf("Starting prediction test, inputing x = 4, expecting y = 8\n");
+    
+    // const double prediction_features = {4};
+    // const double prediction = mlp_feedforward(mlp, prediction_features);
+
+    // // Predict and check:
+    // int c = 1;
+    // for (int i = -15; i <= 14; i++) {
+    //     const double prediction_features[] = {i};
+    //     double prediction = perceptron_feedforward(p, prediction_features);
+    //     double expected_value = i > 9 ? 1 : -1;
+    //     //printf("[ %02d/30 %s ]: Input:%d Expected:%0.0f Prediction:%0.0f\n", c++, expected_value == prediction ? "SUCCESS" : "FAILURE", i, expected_value, prediction);
+    //     //printf("STATUS: %s Feature: %d Prediction: %f\n", expected_value == prediction ? "SUCCESS" : "FAILURE", i, prediction);
+    //     printf("[ %s%02d/30 %s%s ]: Input: %3d Expected: %2.0f Prediction: %2.0f\n", 
+    //         expected_value == prediction ? GREEN : RED, c++, expected_value == prediction ? "SUCCESS" : "FAILURE", RESET, 
+    //         i, expected_value, prediction);
+    // }
 
     destroy_mlp(mlp);
+    return;
 }
+
+// wip:
+// void model_x_gt_9_mlp(void) {
+
+//     // Modelling x > 9:
+//     const double training_features[][1] = {
+//         {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9},
+//         {10}, {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}
+//     };
+//     const double training_labels[] = {
+//         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//          1,  1,  1,  1,  1,  1,  1,  1,  1,  1
+//         };
+//     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
+//     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+
+//     multilayer_perceptron_t *mlp = init_mlp(1, 1, 1, relu_activation, sigmoid_activation, 100);
+
+//     printf("\n");
+
+//     // printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+//     // printf("Model: model_x_gt_9\n");
+//     // printf("Aim: Train a neuron to fire when input vector x_1 > 9\n");
+//     // printf("Architecture: Single Perceptron\n");
+//     // printf("Input: A one dimensional input vector, x\n");
+//     // printf("\t- x_1: Input value\n");
+//     // printf("Activation: Sign Activation Function\n");
+//     // printf("Loss Function: Perceptron Learning Rule\n\t(weight = weight + (learning_rate)(error := correct - predicted)(input))\n");
+
+//     // printf("Training Strategy:\n");
+//     // printf("\t1000 epochs of correctly labeled integers 0 -> 19 inclusive. No rational/fractional numbers, integers only.\n");
+//     // printf("\tExpected outcome is a normal vector that defines a hyperplane that seperates a two dimensional vector space based on the x value being < 9.\n");
+    
+//     // printf("\n\n");
+
+//     printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+//     printf("Model execution starting now ...\n");
+//     printf("Training 1000 epochs now.\n");
+
+//     train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.1);
+
+//     printf("Training complete.\n");
+
+//     printf("\n\n");
+
+//     // printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+//     // printf("Final weight vector w in R2 (w_0, w_1) = (%f, %f)\n", p->weights[0], p->bias_weight);
+//     // printf("Vector w is a normal vector to a hyperplane/vector subspace defined by: %.2fx + %.2fy = 0\n", p->weights[0], p->bias_weight);
+//     // printf("The hyperplane crosses y = 1 at x = %.2f\n", ((- p->bias_weight) / p->weights[0]));
+//     // printf("\t(y = 1 is important as all input vectors sit at (x=x,y=1) due to the bias term lifting the one dimensional input vectors consisting of x_0 into R2)\n");
+//     // printf("The perceptron will only fire for values that are >= %.2f\n", ((- p->bias_weight) / p->weights[0]));
+
+//     // printf("\n\n");
+
+//     // printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+//     // printf("Starting prediction test from x = -15 to 15\n");
+
+//     // // Predict and check:
+//     // int c = 1;
+//     // for (int i = -15; i <= 14; i++) {
+//     //     const double prediction_features[] = {i};
+//     //     double prediction = perceptron_feedforward(p, prediction_features);
+//     //     double expected_value = i > 9 ? 1 : -1;
+//     //     //printf("[ %02d/30 %s ]: Input:%d Expected:%0.0f Prediction:%0.0f\n", c++, expected_value == prediction ? "SUCCESS" : "FAILURE", i, expected_value, prediction);
+//     //     //printf("STATUS: %s Feature: %d Prediction: %f\n", expected_value == prediction ? "SUCCESS" : "FAILURE", i, prediction);
+//     //     printf("[ %s%02d/30 %s%s ]: Input: %3d Expected: %2.0f Prediction: %2.0f\n", 
+//     //         expected_value == prediction ? GREEN : RED, c++, expected_value == prediction ? "SUCCESS" : "FAILURE", RESET, 
+//     //         i, expected_value, prediction);
+//     // }
+
+//     destroy_mlp(mlp);
+//     return;
+// }
 
 // Array of model mappings
 ModelMapping modelMappings[] = {
     {"model_x_gt_9", "A single dimensional input to a single perceptron, trained on the dataset of x > 9", model_x_gt_9},
     {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
     {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
-    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR}
+    {"model_4x2_mlp", "1 hidden, 1 output, trained to learn the output of equation 4x2", model_4x2_mlp}
+    //wip: {"model_x_gt_9_mlp", "A single dimensional input to a MLP, trained on the dataset of x > 9", model_x_gt_9_mlp},
+    //wip: {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR}
 };
 
 int main(int argc, char *argv[]) {
