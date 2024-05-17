@@ -81,15 +81,14 @@ void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_feature
     }
 }
 
-void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count], const double training_labels, const double learning_rate) {
+void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count], const double training_label, const double learning_rate) {
 
     double output_error[mlp->p_output_count];
     double hidden1_error[mlp->p_hidden1_count];
 
     // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
-    // todo: explain maths later in detail
     for (int k = 0; k < mlp->p_output_count; k++) {
-        output_error[k] = (training_labels - mlp->p_output_output[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
+        output_error[k] = (training_label - mlp->p_output_output[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
         // printf("ERROR: %f\n", output_error[k]);
     }
     
