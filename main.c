@@ -357,7 +357,7 @@ void model_x2_mlp(void) {
     printf("\n");
 
     printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
-    printf("Model: model_4x2_mlp\n");
+    printf("Model: model_x2_mlp\n");
     printf("Aim: Train a simple mlp to double an y input scalar (ie, learn the equation y = 2x.\n");
     printf("Architecture: Multilayer Perceptron (Shallow).\n\t1 Input Node, 1 Hidden Node, 1 Output Node.\n");
     printf("Input: A one dimensional input vector, x\n");
@@ -405,13 +405,89 @@ void model_x2_mlp(void) {
     return;
 }
 
+void model_x2plus1_mlp(void) {
+
+    const double training_features[][1] = {
+        {1}, {2}, {3}, {4},
+        {5}, {6}, {7}, {8}
+    };
+    const double training_labels[] = {
+        3, 5, 7, 9,
+        11, 13, 15, 17
+    };
+    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
+    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+
+    /*
+    Simple architecture, consisting of 1 input node, 1 output node, and 1 hidden node.
+    All activation functions are linear, with no shaping
+    Input Layer           Hidden Layer              Output Layer
+          O  -------------->    O     -------------->    O  
+         x_1    ·   w_1  -> (linear activation) ·   w_2  -> (linear activation)      
+    (Input Node)           (Hidden Node)            (Output Node)
+    */
+    multilayer_perceptron_t *mlp = init_mlp(1, 1, 1, linear_activation, derivative_linear_activation, 
+        linear_activation, derivative_linear_activation, 500);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: model_x2plus1_mlp\n");
+    printf("Aim: Train a simple mlp to double an y input scalar (ie, learn the equation y = 2x + 1.\n");
+    printf("Architecture: Multilayer Perceptron (Shallow).\n\t1 Input Node, 1 Hidden Node, 1 Output Node.\n");
+    printf("Input: A one dimensional input vector, x\n");
+    printf("\t- x_1: Input value\n");
+    printf("Activation: Linear Activation Function (No shaping)\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+
+    printf("Training Strategy:\n");
+    printf("\t500 epochs of y = 2x + 1 where x = {1..8} \n");
+    
+    printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training 500 epochs now.\n");
+
+    train_mlp(mlp, training_rows, training_columns, training_features, training_labels, 0.01);
+
+    printf("Training complete.\n");
+
+    printf("\n\n");
+
+    printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    printf("Hidden node weight: %f bias: %f\n", mlp->p_hidden1[0]->weights[0], mlp->p_hidden1[0]->bias_weight);
+    printf("Output node weight: %f bias: %f\n", mlp->p_output[0]->weights[0], mlp->p_output[0]->bias_weight);
+
+    printf("\n\n");
+
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+
+    for (double i = 0.0; i <= 20; i++) {
+        const double prediction_features[] = {i};
+        mlp_feedforward(mlp, prediction_features);
+
+        // Round up to 2 decimal places:
+        const double result = round(mlp->p_output_output[0] * 100) / 100.0;
+        const double expected = (i * 2) + 1;
+
+        printf("[ %s%s%s ]: Input x_1: %f Expected: %f Prediction: %f\n",
+            result == expected ? GREEN : RED, result == expected ? "SUCCESS" : "FAILURE", RESET,
+            prediction_features[0], expected, result);
+    }
+    
+    destroy_mlp(mlp);
+    return;
+}
+
 // Array of model mappings
 ModelMapping modelMappings[] = {
     {"model_x_gt_9", "A single dimensional input to a single perceptron, trained on the dataset of x > 9", model_x_gt_9},
     {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
     {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
     {"model_4x2_mlp", "1 hidden, 1 output, trained to learn the output of equation 4x2", model_4x2_mlp},
-    {"model_x2_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x", model_x2_mlp}
+    {"model_x2_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x", model_x2_mlp},
+    {"model_x2plus1_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x + 1", model_x2plus1_mlp}
     //wip: {"model_x_gt_9_mlp", "A single dimensional input to a MLP, trained on the dataset of x > 9", model_x_gt_9_mlp},
     //wip: {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR}
 };
