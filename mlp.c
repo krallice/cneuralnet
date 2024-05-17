@@ -61,6 +61,65 @@ double step_function(double x) {
     return x > 0.5 ? 1 : 0;
 }
 
+void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count]) {
+    
+    // Activate hidden layer:
+    // For each perceptron in the hidden layer:
+    for (int k = 0; k < mlp->p_hidden1_count; k++) {
+        // Pass in the complete set of training features as input to each perceptron in the hidden layer and capture the
+        // activated output in the p_hidden1_output array:
+        mlp->p_hidden1_output[k] = perceptron_feedforward(mlp->p_hidden1[k], training_features);
+        // printf("\t\tHidden1[%d]: %f\n", k, mlp->p_hidden1_output[k]);
+    }
+
+    // Activate output layer:
+    // For each perceptron in the output layer:
+    for (int k = 0; k < mlp->p_output_count; k++) {
+        // Pass in the output of the hidden layer as input to each perceptron in the output layer and capture the activated output:
+        mlp->p_output_output[k] = perceptron_feedforward(mlp->p_output[k], mlp->p_hidden1_output);
+        // printf("\t\tOutput[%d]: %f\n", k, mlp->p_output_output[k]);
+    }
+}
+
+void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count], const double training_labels, const double learning_rate) {
+
+    double output_error[mlp->p_output_count];
+    double hidden1_error[mlp->p_hidden1_count];
+
+    // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
+    // todo: explain maths later in detail
+    for (int k = 0; k < mlp->p_output_count; k++) {
+        output_error[k] = (training_labels - mlp->p_output_output[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
+        // printf("ERROR: %f\n", output_error[k]);
+    }
+    
+    // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
+    // todo: explain maths later in detail
+    for (int k = 0; k < mlp->p_hidden1_count; k++) {
+        hidden1_error[k] = 0.0;
+        for (int j = 0; j < mlp->p_output_count; j++) {
+            hidden1_error[k] += output_error[j] * mlp->p_output[j]->weights[k];
+        }
+        for (int j = 0; j < mlp->p_hidden1_count; j++) {
+            mlp->p_output[k]->weights[j] += learning_rate * output_error[k] * mlp->p_hidden1_output[j];
+        }
+        hidden1_error[k] *= mlp->p_hidden1[k]->derivative_activation_function(mlp->p_hidden1_output[k]);   
+    }
+
+    // Update the weights of the hidden layer:
+    for (int k = 0; k < mlp->p_hidden1_count; k++) {
+        mlp->p_hidden1[k]->bias_weight += learning_rate * hidden1_error[k];
+        for (int j = 0; j < mlp->input_count; j++) {
+            mlp->p_hidden1[k]->weights[j] += learning_rate * hidden1_error[k] * training_features[j];
+        }
+    }
+
+    // Update the weights of the output layer:
+    for (int k = 0; k < mlp->p_output_count; k++) {
+        mlp->p_output[k]->bias_weight += learning_rate * output_error[k];
+    }
+}   
+
 void train_mlp(multilayer_perceptron_t *mlp, int row_count, int column_count, const double training_features[row_count][column_count], const double training_labels[row_count], const double learning_rate) {
 
     // Exit if trying to train based on more features than expected:
@@ -70,74 +129,21 @@ void train_mlp(multilayer_perceptron_t *mlp, int row_count, int column_count, co
     }
 
     // Foreach Epoch:
-    for (int epoch = 0; epoch < 100; epoch++) {
-    //for (int epoch = 0; epoch < 1; epoch++) {
+    for (int epoch = 0; epoch < mlp->epoch_count; epoch++) {
         // Foreach training vector:
         for (int i = 0; i < row_count; i++) {
-            printf("Epoch: %d, Training Row: %d\n", epoch, i);
-            
+
             // Debug print:
-            printf("\tfeature:");
-            for (int j = 0; j < column_count; j++) {
-                printf("%f ", training_features[i][j]);
-            }
-            printf("label:%f\n", training_labels[i]);
+            // printf("Epoch: %d, Training Row: %d\n", epoch, i);
+            // printf("\tfeature:");
+            // for (int j = 0; j < column_count; j++) {
+            //     printf("%f ", training_features[i][j]);
+            // }
+            // printf("label:%f\n", training_labels[i]);
 
-            // Feedforward:
-
-            // Activate hidden layer:
-            // For each perceptron in the hidden layer:
-            for (int k = 0; k < mlp->p_hidden1_count; k++) {
-                // Pass in the complete set of training features as input to each perceptron in the hidden layer and capture the
-                // activated output in the p_hidden1_output array:
-                mlp->p_hidden1_output[k] = perceptron_feedforward(mlp->p_hidden1[k], training_features[i]);
-                printf("\t\tHidden1[%d]: %f\n", k, mlp->p_hidden1_output[k]);
-            }
-
-            // Activate output layer:
-            // For each perceptron in the output layer:
-            for (int k = 0; k < mlp->p_output_count; k++) {
-                // Pass in the output of the hidden layer as input to each perceptron in the output layer and capture the activated output:
-                mlp->p_output_output[k] = perceptron_feedforward(mlp->p_output[k], mlp->p_hidden1_output);
-                printf("\t\tOutput[%d]: %f\n", k, mlp->p_output_output[k]);
-            }
-
-            // Backpropagation:
-            double output_error[mlp->p_output_count];
-            double hidden1_error[mlp->p_hidden1_count];
-
-            // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
-            // todo: explain maths later in detail
-            for (int k = 0; k < mlp->p_output_count; k++) {
-                output_error[k] = (training_labels[i] - mlp->p_output_output[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
-                printf("ERROR: %f\n", output_error[k]);
-            }
-            
-            // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
-            // todo: explain maths later in detail
-            for (int k = 0; k < mlp->p_hidden1_count; k++) {
-                hidden1_error[k] = 0.0;
-                for (int j = 0; j < mlp->p_output_count; j++) {
-                    hidden1_error[k] += output_error[j] * mlp->p_output[j]->weights[k];
-                }
-                hidden1_error[k] *= mlp->p_hidden1[k]->derivative_activation_function(mlp->p_hidden1_output[k]);
-            }
-
-            // Update the weights of the output layer:
-            for (int k = 0; k < mlp->p_output_count; k++) {
-                mlp->p_output[k]->bias_weight += learning_rate * output_error[k];
-                for (int j = 0; j < mlp->p_hidden1_count; j++) {
-                    mlp->p_output[k]->weights[j] += learning_rate * output_error[k] * mlp->p_hidden1_output[j];
-                }
-            }
-
-            // Update the weights of the hidden layer:
-            for (int k = 0; k < mlp->p_hidden1_count; k++) {
-                mlp->p_hidden1[k]->bias_weight += learning_rate * hidden1_error[k];
-                for (int j = 0; j < mlp->input_count; j++) {
-                    mlp->p_hidden1[k]->weights[j] += learning_rate * hidden1_error[k] * training_features[i][j];
-                }
-            }
+            // Predict and train:
+            mlp_feedforward(mlp, training_features[i]);
+            mlp_backpropagate(mlp, training_features[i], training_labels[i], learning_rate);
         }
     }
 }
