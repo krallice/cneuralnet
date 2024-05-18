@@ -229,7 +229,7 @@ void model_AND(void) {
         double correct_result = (double)((int)training_features[i][0] & (int)training_features[i][1]) == 0 ? 0 : 1;
         double prediction = perceptron_feedforward(p, training_features[i]);
 
-        printf("[ %s%02d/04 %s%s ]: Input: (%2.f, %2.f) Expected: %2.f Prediction: %2.f\n", 
+        printf("[ %s%02d/04 %s%s ]: Input: (%.f, %.f) Expected: %2.f Prediction: %2.f\n", 
             (correct_result == prediction) ? GREEN : RED,
             i + 1, (correct_result == prediction) ? "SUCCESS" : "ERROR  ", RESET,
             training_features[i][0], training_features[i][1], correct_result, prediction);
