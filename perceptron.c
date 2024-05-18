@@ -4,7 +4,7 @@
 //            Create/Destroy             //
 //  ///////////////////////////////////  //
 
-perceptron_t *init_perceptron(const int input_count, double (*activation_function)(double), int training_epoch_count) {
+perceptron_t *init_perceptron(const int input_count, double (*activation_function)(double), double (*derivative_activation_function)(double), int training_epoch_count) {
     
     // Init and zeroise:
     perceptron_t *p = (perceptron_t*)malloc(sizeof(*p));
@@ -22,6 +22,7 @@ perceptron_t *init_perceptron(const int input_count, double (*activation_functio
 
     p->input_count = input_count;
     p->activation_function = activation_function;
+    p->derivative_activation_function = derivative_activation_function;
     p->training_epoch_count = training_epoch_count;
 
     return p;
@@ -45,12 +46,24 @@ double sign_activation_function(double x) {
     return x < 0 ? -1 : 1;
 }
 
+double step_activation_function(double x) {
+    return x < 0 ? 0 : 1;
+}
+
 // ////////////////////////////////////  //
 //         Differentiable Activation     //
 //               Functions               //
 //  ///////////////////////////////////  //
 
 // The following activation functions are used in neural networks, where backpropegation is required to calculate the gradient of the loss function.
+
+double linear_activation(double x) {
+    return x;
+}
+
+double derivative_linear_activation(double x) {
+    return 1;
+}
 
 // Rectified Linear Unit:
 // Nice properties from it being close to linear (TODO: describe why later)
@@ -64,13 +77,12 @@ double derivative_relu_activation(double x) {
 
 // Sigmoid
 // TOOD: Describe properties later
-
 double sigmoid_activation(double x) {
-    return 1 / (1 + exp(-x));
+    return 1.0 / (1.0 + exp(-x));
 }
 
 double derivative_sigmoid_activation(double x) {
-    return sigmoid_activation(x) * (1 - sigmoid_activation(x));
+    return x * (1.0 - x);
 }
 
 // ////////////////////////////////////  //
