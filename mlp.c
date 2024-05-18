@@ -63,15 +63,14 @@ double step_function(double x) {
 
 void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count]) {
     
+    // Activate hidden layer:
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
-        // Pass in the complete set of training features as input to each perceptron in the hidden layer and capture the
-        // activated output in the p_hidden1_output array:
+        // Pass in the complete set of training features as input to each perceptron in the hidden layer and capture the activated output
         mlp->p_hidden1_output[k] = perceptron_feedforward(mlp->p_hidden1[k], training_features);
         // printf("\t\tHidden1[%d]: %f\n", k, mlp->p_hidden1_output[k]);
     }
 
     // Activate output layer:
-    // For each perceptron in the output layer:
     for (int k = 0; k < mlp->p_output_count; k++) {
         // Pass in the output of the hidden layer as input to each perceptron in the output layer and capture the activated output:
         mlp->p_output_output[k] = perceptron_feedforward(mlp->p_output[k], mlp->p_hidden1_output);
@@ -80,39 +79,64 @@ void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_feature
 }
 
 void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[], const double training_labels[], double learning_rate) {
-    double output_error[mlp->p_output_count];
-    double hidden1_error[mlp->p_hidden1_count];
+    
+    // Equations of a node:
+    // Pre-Activation: z = w * x + b
+    // Activated: a = f(z), where f is the activation function
 
-    // Calculate the error for each perceptron in the output layer
+    // Back propegation 'unwinds' the above relationships to work out how much each weight should be adjusted to reduce the loss function to its minimum.
+    // In this instance, we're using the mean squared error loss function (MSE): L = 1/2 * (a - y)^2
+    // Technically, the definition of the MSE loss function is L = (y - a)^2, but the 1/2 is added as it 
+    // doesn't affect the gradient of the loss function, but simplifies its calculation.
+
+    double output_dLdz[mlp->p_output_count];
+    double hidden1_dLdz[mlp->p_hidden1_count];
+
+    // Stage 1. Calculate the gradient of the loss function with respect to z (the pre-activated output of the node):
+
+    // For each node in the output layer, calculate dL/dz:
     for (int k = 0; k < mlp->p_output_count; k++) {
-        double output = mlp->p_output_output[k];
-        output_error[k] = (output - training_labels[k]) * mlp->p_output[k]->derivative_activation_function(output);
+        // dL/dz = da/dz * dL/da
+        // dL/dz =  f'(z) * (y - a)
+        output_dLdz[k] = (mlp->p_output_output[k] - training_labels[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
     }
 
-    // Calculate the error for each perceptron in the hidden layer
+    // For each node in the hidden1 layer, calculate dL/dz:
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
-        hidden1_error[k] = 0.0;
+        hidden1_dLdz[k] = 0.0;
         for (int j = 0; j < mlp->p_output_count; j++) {
-            hidden1_error[k] += output_error[j] * mlp->p_output[j]->weights[k];
+            // Build up the sigma component of equation:
+            // dL/dz = da/dz * Σ(dz/da * output_dLdz)
+            // dL/dz = da/dz * Σ(w * output_dLdz)
+            hidden1_dLdz[k] += mlp->p_output[j]->weights[k] * output_dLdz[j];
         }
-        double hidden_output = mlp->p_hidden1_output[k];
-        hidden1_error[k] *= mlp->p_hidden1[k]->derivative_activation_function(hidden_output);
+        // Compute da/dz to finalise calculation of hidden1_dLdz:
+        // dL/dz = f'(z) * Σ(w * output_dLdz)
+        hidden1_dLdz[k] *= mlp->p_hidden1[k]->derivative_activation_function(mlp->p_hidden1_output[k]);
     }
 
-    // Update the weights and biases for the output layer
+    // Stage 2. Calculate the gradient of the loss function with respect to w (the input weight),
+    // and update the weights using the update rule (gradient descent): w ← w - (α * (dL/dw))
+
+    // Output layer:
     for (int k = 0; k < mlp->p_output_count; k++) {
         for (int j = 0; j < mlp->p_hidden1_count; j++) {
-            mlp->p_output[k]->weights[j] -= learning_rate * output_error[k] * mlp->p_hidden1_output[j];
+            // Gradient descent for each weight associated with the output node,
+            // noting that dL/dw = dz/dw * dL/dz, and dz/dw = a (the output of the hidden layer):
+            // w ← w - (α * (dz/dw * dL/dz))
+            mlp->p_output[k]->weights[j] -= learning_rate * (mlp->p_hidden1_output[j] * output_dLdz[k]);
         }
-        mlp->p_output[k]->bias_weight -= learning_rate * output_error[k];
+        // For the bias, dz/dw = 1, so we can simplify the equation to:
+        // w ← w - (α * (1 * dL/dz))
+        mlp->p_output[k]->bias_weight -= learning_rate * output_dLdz[k];
     }
 
-    // Update the weights and biases for the hidden layer
+    // Hidden layer, same logic as above:
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
         for (int j = 0; j < mlp->input_count; j++) {
-            mlp->p_hidden1[k]->weights[j] -= learning_rate * hidden1_error[k] * training_features[j];
+            mlp->p_hidden1[k]->weights[j] -= learning_rate * (training_features[j] * hidden1_dLdz[k]);
         }
-        mlp->p_hidden1[k]->bias_weight -= learning_rate * hidden1_error[k];
+        mlp->p_hidden1[k]->bias_weight -= learning_rate * hidden1_dLdz[k];
     }
 }
 
