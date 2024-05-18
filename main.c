@@ -29,8 +29,8 @@ void model_x_gt_9(void) {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
          1,  1,  1,  1,  1,  1,  1,  1,  1,  1
         };
-    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
-    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
 
     perceptron_t *p = init_perceptron(1, sign_activation_function, NULL, 1000);
 
@@ -55,7 +55,7 @@ void model_x_gt_9(void) {
     printf("Model execution starting now ...\n");
     printf("Training 1000 epochs now.\n");
 
-    train_perceptron(p, training_rows, training_columns, training_features, training_labels, 0.1);
+    train_perceptron(p, feature_count, feature_dimension, training_features, training_labels, 0.1);
 
     printf("Training complete.\n");
 
@@ -189,8 +189,8 @@ void model_AND(void) {
     const double training_labels[] = {
         0, 0, 0, 1
     };
-    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
-    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
 
     printf("\n");
     printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
@@ -206,14 +206,14 @@ void model_AND(void) {
     printf("Training Strategy:\n");
     printf("\tPerceptron trained with 100 epochs of the entire truth table of an AND gate.\n");
     
-    perceptron_t *p = init_perceptron(training_columns, step_activation_function, NULL, 100);
+    perceptron_t *p = init_perceptron(feature_dimension, step_activation_function, NULL, 100);
 
     printf("\n\n");
     printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
     printf("Model execution starting now ...\n");
     printf("Training 100 epochs now.\n");
 
-    train_perceptron(p, training_rows, training_columns, training_features, training_labels, 0.1);
+    train_perceptron(p, feature_count, feature_dimension, training_features, training_labels, 0.1);
 
     printf("\n\n");
     printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
@@ -224,7 +224,7 @@ void model_AND(void) {
     printf("\n\n");
 
     printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
-    for (int i = 0; i < training_rows; i++) {
+    for (int i = 0; i < feature_count; i++) {
 
         double correct_result = (double)((int)training_features[i][0] & (int)training_features[i][1]) == 0 ? 0 : 1;
         double prediction = perceptron_feedforward(p, training_features[i]);
@@ -247,8 +247,8 @@ void model_4x2_mlp(void) {
     const double training_labels[][1] = {
         {8}
     };
-    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
-    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
     int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
 
     /*
@@ -281,7 +281,7 @@ void model_4x2_mlp(void) {
     printf("Model execution starting now ...\n");
     printf("Training 100 epochs now.\n");
 
-    train_mlp(mlp, training_rows, training_columns, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
 
     printf("Training complete.\n");
 
@@ -320,8 +320,8 @@ void model_x2_mlp(void) {
         {2}, {4}, {6}, {8},
         {10}, {12}, {14}, {16}
     };
-    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
-    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
     int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
 
     /*
@@ -355,7 +355,7 @@ void model_x2_mlp(void) {
     printf("Model execution starting now ...\n");
     printf("Training 500 epochs now.\n");
 
-    train_mlp(mlp, training_rows, training_columns, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
 
     printf("Training complete.\n");
 
@@ -396,8 +396,8 @@ void model_x2plus1_mlp(void) {
         {3}, {5}, {7}, {9},
         {11}, {13}, {15}, {17}
     };
-    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
-    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
     int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
 
     /*
@@ -431,7 +431,7 @@ void model_x2plus1_mlp(void) {
     printf("Model execution starting now ...\n");
     printf("Training 500 epochs now.\n");
 
-    train_mlp(mlp, training_rows, training_columns, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
 
     printf("Training complete.\n");
 
@@ -468,14 +468,11 @@ void model_XOR(void) {
     const double training_features[][2] = {
         {0, 0}, {0, 1}, {1, 0}, {1, 1}
     };
-    // const double training_labels[][1] = {
-    //     {0}, {1}, {1}, {0}
-    // };
     const double training_labels[][1] = {
         {0}, {1}, {1}, {0}
     };
-    int training_rows = sizeof(training_features) / sizeof(training_features[0]);
-    int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
     int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
 
     // Still a simple architecture, consisting of 2 input node, 2 hidden nodes, and 1 hidden node.
@@ -503,7 +500,7 @@ void model_XOR(void) {
     printf("Model execution starting now ...\n");
     printf("Training 300000 epochs now.\n");
 
-    train_mlp(mlp, training_rows, training_columns, training_features, label_dimension, training_labels, 0.1);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.1);
 
     printf("Training complete.\n");
 
@@ -518,7 +515,7 @@ void model_XOR(void) {
 
     printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
 
-    for (int i = 0; i < training_rows; i++) {
+    for (int i = 0; i < feature_count; i++) {
         mlp_feedforward(mlp, training_features[i]);
         const double prediction = mlp->p_output_output[0] > 0.5 ? 1 : 0;
         printf("[ %s%02d/04 %s%s ]: Input: (%0.0f, %0.0f) Expected: %0.0f Prediction: %f (%f)\n", 

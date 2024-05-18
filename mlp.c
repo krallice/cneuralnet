@@ -121,7 +121,12 @@ void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dime
 
     // Exit if trying to train based on more features than expected:
     if (mlp->input_count != feature_dimension) {
-        printf("Invalid Input\n");
+        printf("Invalid Feature Dimensionality.\n");
+        return;
+    }
+
+    if (mlp->p_output_count != label_dimension) {
+        printf("Invalid Label Dimensionality.\n");
         return;
     }
 
