@@ -21,6 +21,7 @@ void destroy_perceptron(perceptron_t *p);
 
 // Activation functions:
 double sign_activation_function(double x);
+double step_activation_function(double x);
 
 double linear_activation(double x);
 double derivative_linear_activation(double x);

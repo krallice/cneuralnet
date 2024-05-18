@@ -187,7 +187,7 @@ void model_AND(void) {
         {0, 0}, {0, 1}, {1, 0}, {1, 1}
     };
     const double training_labels[] = {
-        -1, -1, -1, 1
+        0, 0, 0, 1
     };
     int training_rows = sizeof(training_features) / sizeof(training_features[0]);
     int training_columns = sizeof(training_features[0]) / sizeof(training_features[0][0]);
@@ -206,7 +206,7 @@ void model_AND(void) {
     printf("Training Strategy:\n");
     printf("\tPerceptron trained with 100 epochs of the entire truth table of an AND gate.\n");
     
-    perceptron_t *p = init_perceptron(training_columns, sign_activation_function, NULL, 100);
+    perceptron_t *p = init_perceptron(training_columns, step_activation_function, NULL, 100);
 
     printf("\n\n");
     printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
@@ -226,7 +226,7 @@ void model_AND(void) {
     printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
     for (int i = 0; i < training_rows; i++) {
 
-        double correct_result = (double)((int)training_features[i][0] & (int)training_features[i][1]) == 0 ? -1 : 1;
+        double correct_result = (double)((int)training_features[i][0] & (int)training_features[i][1]) == 0 ? 0 : 1;
         double prediction = perceptron_feedforward(p, training_features[i]);
 
         printf("[ %s%02d/04 %s%s ]: Input: (%2.f, %2.f) Expected: %2.f Prediction: %2.f\n", 

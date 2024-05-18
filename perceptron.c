@@ -46,6 +46,10 @@ double sign_activation_function(double x) {
     return x < 0 ? -1 : 1;
 }
 
+double step_activation_function(double x) {
+    return x < 0 ? 0 : 1;
+}
+
 // ////////////////////////////////////  //
 //         Differentiable Activation     //
 //               Functions               //
