@@ -503,7 +503,7 @@ void model_XOR(void) {
     printf("Model execution starting now ...\n");
     printf("Training 300000 epochs now.\n");
 
-    train_mlp(mlp, training_rows, training_columns, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, training_rows, training_columns, training_features, label_dimension, training_labels, 0.1);
 
     printf("Training complete.\n");
 
