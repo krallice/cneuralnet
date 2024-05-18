@@ -63,8 +63,6 @@ double step_function(double x) {
 
 void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count]) {
     
-    // Activate hidden layer:
-    // For each perceptron in the hidden layer:
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
         // Pass in the complete set of training features as input to each perceptron in the hidden layer and capture the
         // activated output in the p_hidden1_output array:
@@ -81,48 +79,48 @@ void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_feature
     }
 }
 
-void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[mlp->input_count], const double training_label, const double learning_rate) {
-
+void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[], const double training_labels[], double learning_rate) {
     double output_error[mlp->p_output_count];
     double hidden1_error[mlp->p_hidden1_count];
 
-    // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
+    // Calculate the error for each perceptron in the output layer
     for (int k = 0; k < mlp->p_output_count; k++) {
-        output_error[k] = (training_label - mlp->p_output_output[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
-        // printf("ERROR: %f\n", output_error[k]);
+        double output = mlp->p_output_output[k];
+        output_error[k] = (output - training_labels[k]) * mlp->p_output[k]->derivative_activation_function(output);
     }
-    
-    // Calculate the derivative of the mean squared error loss function with respect to the output of the output layer:
-    // todo: explain maths later in detail
+
+    // Calculate the error for each perceptron in the hidden layer
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
         hidden1_error[k] = 0.0;
         for (int j = 0; j < mlp->p_output_count; j++) {
             hidden1_error[k] += output_error[j] * mlp->p_output[j]->weights[k];
         }
-        for (int j = 0; j < mlp->p_hidden1_count; j++) {
-            mlp->p_output[k]->weights[j] += learning_rate * output_error[k] * mlp->p_hidden1_output[j];
-        }
-        hidden1_error[k] *= mlp->p_hidden1[k]->derivative_activation_function(mlp->p_hidden1_output[k]);   
+        double hidden_output = mlp->p_hidden1_output[k];
+        hidden1_error[k] *= mlp->p_hidden1[k]->derivative_activation_function(hidden_output);
     }
 
-    // Update the weights of the hidden layer:
-    for (int k = 0; k < mlp->p_hidden1_count; k++) {
-        mlp->p_hidden1[k]->bias_weight += learning_rate * hidden1_error[k];
-        for (int j = 0; j < mlp->input_count; j++) {
-            mlp->p_hidden1[k]->weights[j] += learning_rate * hidden1_error[k] * training_features[j];
-        }
-    }
-
-    // Update the weights of the output layer:
+    // Update the weights and biases for the output layer
     for (int k = 0; k < mlp->p_output_count; k++) {
-        mlp->p_output[k]->bias_weight += learning_rate * output_error[k];
+        for (int j = 0; j < mlp->p_hidden1_count; j++) {
+            mlp->p_output[k]->weights[j] -= learning_rate * output_error[k] * mlp->p_hidden1_output[j];
+        }
+        mlp->p_output[k]->bias_weight -= learning_rate * output_error[k];
     }
-}   
 
-void train_mlp(multilayer_perceptron_t *mlp, int row_count, int column_count, const double training_features[row_count][column_count], const double training_labels[row_count], const double learning_rate) {
+    // Update the weights and biases for the hidden layer
+    for (int k = 0; k < mlp->p_hidden1_count; k++) {
+        for (int j = 0; j < mlp->input_count; j++) {
+            mlp->p_hidden1[k]->weights[j] -= learning_rate * hidden1_error[k] * training_features[j];
+        }
+        mlp->p_hidden1[k]->bias_weight -= learning_rate * hidden1_error[k];
+    }
+}
+
+void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dimension, const double training_features[feature_count][feature_dimension],
+    int label_dimension, const double training_labels[feature_count][label_dimension], const double learning_rate) {
 
     // Exit if trying to train based on more features than expected:
-    if (mlp->input_count != column_count) {
+    if (mlp->input_count != feature_dimension) {
         printf("Invalid Input\n");
         return;
     }
@@ -130,7 +128,7 @@ void train_mlp(multilayer_perceptron_t *mlp, int row_count, int column_count, co
     // Foreach Epoch:
     for (int epoch = 0; epoch < mlp->epoch_count; epoch++) {
         // Foreach training vector:
-        for (int i = 0; i < row_count; i++) {
+        for (int i = 0; i < feature_count; i++) {
 
             // Debug print:
             // printf("Epoch: %d, Training Row: %d\n", epoch, i);

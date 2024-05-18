@@ -37,8 +37,9 @@ multilayer_perceptron_t *init_mlp(int p_input_count, int p_hidden1_count, int p_
 void destroy_mlp(multilayer_perceptron_t *mlp);
 
 void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_features[]);
-void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[], const double training_label, const double learning_rate);
+void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[], const double training_labels[], const double learning_rate);
 
-void train_mlp(multilayer_perceptron_t *mlp, int row_count, int column_count, const double training_features[row_count][column_count], const double training_labels[row_count], const double learning_rate);
+void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dimension, const double training_features[feature_count][feature_dimension],
+    int label_dimension, const double training_labels[feature_count][label_dimension], const double learning_rate);
 
 #endif

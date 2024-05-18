@@ -78,11 +78,11 @@ double derivative_relu_activation(double x) {
 // Sigmoid
 // TOOD: Describe properties later
 double sigmoid_activation(double x) {
-    return 1 / (1 + exp(-x));
+    return 1.0 / (1.0 + exp(-x));
 }
 
 double derivative_sigmoid_activation(double x) {
-    return x * (1 - x);
+    return x * (1.0 - x);
 }
 
 // ////////////////////////////////////  //
