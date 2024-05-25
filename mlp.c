@@ -140,8 +140,12 @@ void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_featu
     }
 }
 
+// Implements 3 different training algorithms depending on what value is set for batch_size.
+// Where batch_size == 1, implement Stocastic Gradient Descent (SGD)
+// Where batch_size < feature_count, implement Mini-Batch
+// Where batch_size >= feature_count, implement Batch
 void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dimension, const double training_features[feature_count][feature_dimension],
-    int label_dimension, const double training_labels[feature_count][label_dimension], const double learning_rate) {
+    int label_dimension, const double training_labels[feature_count][label_dimension], const double learning_rate, const int batch_size) {
 
     // Exit if trying to train based on more features than expected:
     if (mlp->input_count != feature_dimension) {
@@ -165,11 +169,22 @@ void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dime
             // for (int j = 0; j < column_count; j++) {
             //     printf("%f ", training_features[i][j]);
             // }
-            // printf("label:%f\n", training_labels[i]);
+            // printf("label:%f\n", training_labels[i])
 
-            // Predict and train:
-            mlp_feedforward(mlp, training_features[i]);
-            mlp_backpropagate(mlp, training_features[i], training_labels[i], learning_rate);
+            // Scotastic Gradient Descent (Update the gradient after every training vector):
+            if (batch_size == 1) {
+                mlp_feedforward(mlp, training_features[i]);
+                mlp_backpropagate(mlp, training_features[i], training_labels[i], learning_rate);
+            // Mini-Batch:
+            } else if (batch_size > 1 && batch_size < feature_count) {
+                // TODO: Implement
+            // Batch:
+            } else if (batch_size >= feature_count) {
+                // TODO: Implement
+            } else {
+                printf("Invalid Batch Size Set.\n");
+                return;
+            }
         }
     }
 }

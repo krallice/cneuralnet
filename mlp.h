@@ -40,6 +40,6 @@ void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_feature
 void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_features[], const double training_labels[], const double learning_rate);
 
 void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dimension, const double training_features[feature_count][feature_dimension],
-    int label_dimension, const double training_labels[feature_count][label_dimension], const double learning_rate);
+    int label_dimension, const double training_labels[feature_count][label_dimension], const double learning_rate, const int batch_size);
 
 #endif
