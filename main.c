@@ -281,7 +281,7 @@ void model_4x2_mlp(void) {
     printf("Model execution starting now ...\n");
     printf("Training 100 epochs now.\n");
 
-    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01, 1);
 
     printf("Training complete.\n");
 
@@ -355,7 +355,7 @@ void model_x2_mlp(void) {
     printf("Model execution starting now ...\n");
     printf("Training 500 epochs now.\n");
 
-    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01, 1);
 
     printf("Training complete.\n");
 
@@ -431,7 +431,7 @@ void model_x2plus1_mlp(void) {
     printf("Model execution starting now ...\n");
     printf("Training 500 epochs now.\n");
 
-    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01, 1);
 
     printf("Training complete.\n");
 
@@ -500,7 +500,7 @@ void model_XOR(void) {
     printf("Model execution starting now ...\n");
     printf("Training 300000 epochs now.\n");
 
-    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.1);
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.1, 1);
 
     printf("Training complete.\n");
 
