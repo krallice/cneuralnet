@@ -183,3 +183,66 @@ void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dime
         }
     }
 }
+
+void save_mlp_weights(const multilayer_perceptron_t *mlp, const char *filename) {
+    
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        perror("Failed to open file for saving weights");
+        return;
+    }
+
+    // Save the MLP structure
+    fwrite(&mlp->input_count, sizeof(int), 1, file);
+    fwrite(&mlp->p_hidden1_count, sizeof(int), 1, file);
+    fwrite(&mlp->p_output_count, sizeof(int), 1, file);
+
+    // Save weights and biases for hidden layer
+    for (int i = 0; i < mlp->p_hidden1_count; i++) {
+        fwrite(mlp->p_hidden1[i]->weights, sizeof(double), mlp->input_count, file);
+        fwrite(&mlp->p_hidden1[i]->bias_weight, sizeof(double), 1, file);
+    }
+
+    // Save weights and biases for output layer
+    for (int i = 0; i < mlp->p_output_count; i++) {
+        fwrite(mlp->p_output[i]->weights, sizeof(double), mlp->p_hidden1_count, file);
+        fwrite(&mlp->p_output[i]->bias_weight, sizeof(double), 1, file);
+    }
+
+    fclose(file);
+}
+
+void load_mlp_weights(multilayer_perceptron_t *mlp, const char *filename) {
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        perror("Failed to open file for loading weights");
+        return;
+    }
+
+    int input_count, hidden1_count, output_count;
+
+    // Read and validate structure
+    fread(&input_count, sizeof(int), 1, file);
+    fread(&hidden1_count, sizeof(int), 1, file);
+    fread(&output_count, sizeof(int), 1, file);
+
+    if (input_count != mlp->input_count || hidden1_count != mlp->p_hidden1_count || output_count != mlp->p_output_count) {
+        fclose(file);
+        fprintf(stderr, "MLP structure does not match file contents\n");
+        return;
+    }
+
+    // Load weights and biases for hidden layer
+    for (int i = 0; i < mlp->p_hidden1_count; i++) {
+        fread(mlp->p_hidden1[i]->weights, sizeof(double), mlp->input_count, file);
+        fread(&mlp->p_hidden1[i]->bias_weight, sizeof(double), 1, file);
+    }
+
+    // Load weights and biases for output layer
+    for (int i = 0; i < mlp->p_output_count; i++) {
+        fread(mlp->p_output[i]->weights, sizeof(double), mlp->p_hidden1_count, file);
+        fread(&mlp->p_output[i]->bias_weight, sizeof(double), 1, file);
+    }
+
+    fclose(file);
+}

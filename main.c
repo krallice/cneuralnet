@@ -638,9 +638,9 @@ void onehot_encode(const int *labels, int num_labels, int num_classes, double on
     }
 }
 
-void exec_mnist(void) {
+void mnist_train(void) {
 
-    // Train, then inference a 784-15-10 neural network on the MNIST dataset
+    // Train 784-15-10 neural network on the MNIST dataset
 
     // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
     // After calling the following loader function, the following variables exist in the global namespace:
@@ -648,9 +648,7 @@ void exec_mnist(void) {
     // train label : train_label[60000] (type: int)
     // test image : test_image[10000][784] (type: double, normalized, flattened)
     // test label : test_label[10000] (type: int)
-    const int training_size = 15000;
-    const int testing_size = 100;
-
+    const int training_size = 60000;
     const int epoch_count = 100;
     
     const int feature_dimension = 784;
@@ -661,6 +659,24 @@ void exec_mnist(void) {
     // Still a simple architecture, consisting of 784 input nodes (mapping the resolution of the input data), 15 hidden nodes, and 10 output nodes.
     multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, linear_activation, derivative_linear_activation, 
     linear_activation, derivative_linear_activation, epoch_count);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: mnist_train\n");
+    printf("Aim: Train a feed forward neural network to model the handwritten MNIST dataset\n");
+    printf("Architecture: 748 Input Nodes, 15 Hidden Nodes, 10 Output Nodes.\n");
+    printf("Hidden Activation: Linear, Output Activation: Linear\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+    printf("\n");
+    printf("Training Size (n): %d\n", training_size);
+    printf("Epoch Count: %d\n", epoch_count);
+
+    printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training %d epochs now.\n", epoch_count);
 
     // One-hot encode the labels into a 10 dimensional vector
     // A value of 3 gets encoded to [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
@@ -678,9 +694,62 @@ void exec_mnist(void) {
     // }
 
     train_mlp(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, 0.0001);
-    
+
     printf("\n\n");
-    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+
+    printf("[ %sSAVING WEIGHTS%s ]\n", YELLOW, RESET);
+    printf("Saving Model Weights to weights.bin\n");
+    printf("\n\n");
+    
+    save_mlp_weights(mlp, "weights.bin");
+    destroy_mlp(mlp);
+
+    printf("[ %sCOMPLETE%s ]\n", YELLOW, RESET);
+    printf("\n\n");
+
+    return;
+}
+
+void mnist_test(void) {
+
+    // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
+    // After calling the following loader function, the following variables exist in the global namespace:
+    // train image : train_image[60000][784] (type: double, normalized, flattened)
+    // train label : train_label[60000] (type: int)
+    // test image : test_image[10000][784] (type: double, normalized, flattened)
+    // test label : test_label[10000] (type: int)
+    const int testing_size = 10000;
+    const int epoch_count = 0;
+    
+    const int feature_dimension = 784;
+    const int hidden_count = 15;
+    const int label_dimension = 10;
+    load_mnist();
+
+    // Still a simple architecture, consisting of 784 input nodes (mapping the resolution of the input data), 15 hidden nodes, and 10 output nodes.
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, linear_activation, derivative_linear_activation, 
+    linear_activation, derivative_linear_activation, epoch_count);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: mnist_test\n");
+    printf("Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.\n");
+    printf("Architecture: 748 Input Nodes, 15 Hidden Nodes, 10 Output Nodes.\n");
+    printf("Hidden Activation: Linear, Output Activation: Linear\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+    printf("\n");
+    printf("Testing Size (n): %d\n", testing_size);
+
+    printf("\n\n");
+
+    printf("[ %sLOADING WEIGHTS%s ]\n", YELLOW, RESET);
+    printf("Loading Model Weights from weights.bin\n");
+    printf("\n\n");
+
+    load_mlp_weights(mlp, "weights.bin");
+    
+    // printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
 
     double test_label_onehot[testing_size][label_dimension];
     onehot_encode(test_label, testing_size, label_dimension, test_label_onehot);
@@ -703,13 +772,12 @@ void exec_mnist(void) {
             success_count++;
         }
 
-        printf("[ %s%02d/%02d %s%s ]: Input Image: %d Expected: %d Prediction: %d\n", 
-            (test_label[i] == prediction) ? GREEN : RED, i + 1, testing_size,
-            (test_label[i] == prediction) ? "SUCCESS" : "FAILURE", RESET,
-            i + 1, test_label[i], prediction);
+        // printf("[ %s%02d/%02d %s%s ]: Input Image: %d Expected: %d Prediction: %d\n", 
+        //     (test_label[i] == prediction) ? GREEN : RED, i + 1, testing_size,
+        //     (test_label[i] == prediction) ? "SUCCESS" : "FAILURE", RESET,
+        //     i + 1, test_label[i], prediction);
     }
 
-    printf("\n\n");
     printf("[ %sPREDICTION RESULTS%s ]\n", YELLOW, RESET);
     printf("Testing set size: %d\n", testing_size);
     printf("Success count: %d\n", success_count);
@@ -719,6 +787,7 @@ void exec_mnist(void) {
 
     return;
 }
+
 // Array of model mappings
 ModelMapping modelMappings[] = {
     // Single Perceptrons:
@@ -733,7 +802,9 @@ ModelMapping modelMappings[] = {
     // Deep Neural Networks, Multiple Output:
     {"model_2dout", "A multi-layer perceptron, outputing a 2d vector", model_2dout},
     // Realworld Dataset:
-    {"exec_mnist", "Train and then Inference a 784-15-10 NN on the MNIST dataset", exec_mnist}
+    {"mnist_train", "Train a 784-15-10 NN on the MNIST dataset", mnist_train},
+    {"mnist_test", "Test a 784-15-10 NN on the MNIST dataset", mnist_test}
+    
 };
 
 int main(int argc, char *argv[]) {
