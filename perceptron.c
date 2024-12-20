@@ -14,11 +14,11 @@ perceptron_t *init_perceptron(const int input_count, double (*activation_functio
     // Randomly set the starting weights on a value between -1 and 1
     p->weights = malloc(sizeof(double) * input_count);
     for (int i = 0; i < input_count; i++) {
-        p->weights[i] = (rand() / (double)RAND_MAX * 2 - 1);
+        p->weights[i] = (rand() / (double)RAND_MAX * 2 - 1) * 0.01;
     }
 
     // Assign the Biases weight between -1 and 1:
-    p->bias_weight = (rand() / (double)RAND_MAX * 2 - 1);
+    p->bias_weight = (rand() / (double)RAND_MAX * 2 - 1) * 0.01;
 
     p->input_count = input_count;
     p->activation_function = activation_function;
