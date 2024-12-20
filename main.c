@@ -563,7 +563,7 @@ void model_2dout(void) {
     printf("Input: A 2 dimensional input vector, x\n");
     printf("\t- x_1: Input value 1\n");
     printf("\t- x_2: Input value 2\n");
-    printf("Activation: Linear\n");
+    printf("Activation: ReLU\n");
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
 
     printf("Training Strategy:\n");
