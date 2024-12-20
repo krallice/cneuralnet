@@ -626,7 +626,7 @@ void model_2dout(void) {
 void onehot_encode(const int *labels, int num_labels, int num_classes, double one_hot[][10]) {
 
     // Zeroise:
-    memset(one_hot, 0, num_labels * num_classes * sizeof(int));
+    memset(one_hot, 0, num_labels * num_classes * sizeof(double));
 
     // Set the appropriate index in each one-hot vector to 1
     for (int i = 0; i < num_labels; i++) {
@@ -638,9 +638,9 @@ void onehot_encode(const int *labels, int num_labels, int num_classes, double on
     }
 }
 
-void train_mnist(void) {
+void exec_mnist(void) {
 
-    // Train a multi-layer perceptron on the MNIST dataset
+    // Train, then inference a 784-15-10 neural network on the MNIST dataset
 
     // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
     // After calling the following loader function, the following variables exist in the global namespace:
@@ -648,8 +648,10 @@ void train_mnist(void) {
     // train label : train_label[60000] (type: int)
     // test image : test_image[10000][784] (type: double, normalized, flattened)
     // test label : test_label[10000] (type: int)
-    const int training_size = 5;
-    const int test_size = 10000;
+    const int training_size = 15000;
+    const int testing_size = 100;
+
+    const int epoch_count = 100;
     
     const int feature_dimension = 784;
     const int hidden_count = 15;
@@ -657,25 +659,61 @@ void train_mnist(void) {
     load_mnist();
 
     // Still a simple architecture, consisting of 784 input nodes (mapping the resolution of the input data), 15 hidden nodes, and 10 output nodes.
-    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, sigmoid_activation, derivative_sigmoid_activation, 
-    sigmoid_activation, derivative_sigmoid_activation, 1);
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, linear_activation, derivative_linear_activation, 
+    linear_activation, derivative_linear_activation, epoch_count);
 
     // One-hot encode the labels into a 10 dimensional vector
     // A value of 3 gets encoded to [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
     double train_label_onehot[training_size][label_dimension];
     onehot_encode(train_label, training_size, label_dimension, train_label_onehot);
 
-    // Diagnostics:
+    // One-hot encoded labels::
     // for (int i = 0; i < training_size; i++) {
     //     printf("%d\n", train_label[i]);
     //     printf("One-hot encoded label: ");
     //     for (int j = 0; j < label_dimension; j++) {
-    //         printf("%d ", train_label_onehot[i][j]);
+    //         printf("%f ", train_label_onehot[i][j]);
     //     }
     //     printf("\n");
     // }
 
-    // train_mlp(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, 0.0001);
+    train_mlp(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, 0.0001);
+    
+    printf("\n\n");
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+
+    double test_label_onehot[testing_size][label_dimension];
+    onehot_encode(test_label, testing_size, label_dimension, test_label_onehot);
+    
+    int success_count = 0;
+    int prediction = -1;
+    for (int i = 0; i < testing_size; i++) {
+        
+        mlp_feedforward(mlp, test_image[i]);
+        
+        // Undo the onehot encoding:
+        prediction = -1;
+        for (int j = 0; j < label_dimension; j++) {
+            if (round(mlp->p_output_output[j]) > prediction) {
+                prediction = j;
+            }
+        }
+
+        if (test_label[i] == prediction) {
+            success_count++;
+        }
+
+        printf("[ %s%02d/%02d %s%s ]: Input Image: %d Expected: %d Prediction: %d\n", 
+            (test_label[i] == prediction) ? GREEN : RED, i + 1, testing_size,
+            (test_label[i] == prediction) ? "SUCCESS" : "FAILURE", RESET,
+            i + 1, test_label[i], prediction);
+    }
+
+    printf("\n\n");
+    printf("[ %sPREDICTION RESULTS%s ]\n", YELLOW, RESET);
+    printf("Testing set size: %d\n", testing_size);
+    printf("Success count: %d\n", success_count);
+    printf("Success rate: %0.2f%%\n", ((double)success_count / testing_size) * 100);
 
     destroy_mlp(mlp);
 
@@ -695,7 +733,7 @@ ModelMapping modelMappings[] = {
     // Deep Neural Networks, Multiple Output:
     {"model_2dout", "A multi-layer perceptron, outputing a 2d vector", model_2dout},
     // Realworld Dataset:
-    {"train_mnist", "Train a multi-layer perceptron on the MNIST dataset", train_mnist}
+    {"exec_mnist", "Train and then Inference a 784-15-10 NN on the MNIST dataset", exec_mnist}
 };
 
 int main(int argc, char *argv[]) {
