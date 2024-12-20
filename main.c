@@ -559,7 +559,7 @@ void model_2dout(void) {
     printf("Aim: Train a 2-12-2 mlp to model the following R^2 -> R^2 function\n");
     printf("\t- y_1 = x_1 + x_2\n");
     printf("\t- y_2 = 2(x_1 + x_2)\n");
-    printf("Architecture: 2 Input Nodes, 2 Hidden Nodes, 2 Output Nodes.\n");
+    printf("Architecture: 2 Input Nodes, 12 Hidden Nodes (this is overkill on purpose), 2 Output Nodes.\n");
     printf("Input: A 2 dimensional input vector, x\n");
     printf("\t- x_1: Input value 1\n");
     printf("\t- x_2: Input value 2\n");
