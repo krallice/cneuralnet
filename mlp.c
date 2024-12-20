@@ -67,14 +67,14 @@ void mlp_feedforward(multilayer_perceptron_t *mlp, const double training_feature
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
         // Pass in the complete set of training features as input to each perceptron in the hidden layer and capture the activated output
         mlp->p_hidden1_output[k] = perceptron_feedforward(mlp->p_hidden1[k], training_features);
-        // printf("\t\tHidden1[%d]: %f\n", k, mlp->p_hidden1_output[k]);
+        printf("\t\tHidden1[%d]: %f\n", k, mlp->p_hidden1_output[k]);
     }
 
     // Activate output layer:
     for (int k = 0; k < mlp->p_output_count; k++) {
         // Pass in the output of the hidden layer as input to each perceptron in the output layer and capture the activated output:
         mlp->p_output_output[k] = perceptron_feedforward(mlp->p_output[k], mlp->p_hidden1_output);
-        // printf("\t\tOutput[%d]: %f\n", k, mlp->p_output_output[k]);
+        printf("\t\tOutput[%d]: %f\n", k, mlp->p_output_output[k]);
     }
 }
 
@@ -99,6 +99,7 @@ void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_featu
         // dL/dz = da/dz * dL/da
         // dL/dz =  f'(z) * (y - a)
         output_dLdz[k] = (mlp->p_output_output[k] - training_labels[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
+        printf("output_dLdz[%d] = %f\n", k, output_dLdz[k]);
     }
 
     // For each node in the hidden1 layer, calculate dL/dz:
@@ -120,12 +121,14 @@ void mlp_backpropagate(multilayer_perceptron_t *mlp, const double training_featu
 
     // Output layer:
     for (int k = 0; k < mlp->p_output_count; k++) {
+        printf("Before update: output weights[%d][0] = %f\n", k, mlp->p_output[k]->weights[0]);
         for (int j = 0; j < mlp->p_hidden1_count; j++) {
             // Gradient descent for each weight associated with the output node,
             // noting that dL/dw = dz/dw * dL/dz, and dz/dw = a (the output of the hidden layer):
             // w ← w - (α * (dz/dw * dL/dz))
             mlp->p_output[k]->weights[j] -= learning_rate * (mlp->p_hidden1_output[j] * output_dLdz[k]);
         }
+        printf("After update: output weights[%d][0] = %f\n", k, mlp->p_output[k]->weights[0]);
         // For the bias, dz/dw = 1, so we can simplify the equation to:
         // w ← w - (α * (1 * dL/dz))
         mlp->p_output[k]->bias_weight -= learning_rate * output_dLdz[k];
@@ -160,7 +163,7 @@ void train_mlp(multilayer_perceptron_t *mlp, int feature_count, int feature_dime
         for (int i = 0; i < feature_count; i++) {
 
             // Debug print:
-            // printf("Epoch: %d, Training Row: %d\n", epoch, i);
+            printf("Epoch: %d, Training Row: %d\n", epoch, i);
             // printf("\tfeature:");
             // for (int j = 0; j < column_count; j++) {
             //     printf("%f ", training_features[i][j]);

@@ -5,6 +5,7 @@
 
 #include "perceptron.h"
 #include "mlp.h"
+#include "mnist.h"
 
 #define RED "\x1b[31m"
 #define GREEN "\x1b[32m"
@@ -622,6 +623,64 @@ void model_2dout(void) {
     return;
 }
 
+void onehot_encode(const int *labels, int num_labels, int num_classes, double one_hot[][10]) {
+
+    // Zeroise:
+    memset(one_hot, 0, num_labels * num_classes * sizeof(int));
+
+    // Set the appropriate index in each one-hot vector to 1
+    for (int i = 0; i < num_labels; i++) {
+        if (labels[i] >= 0 && labels[i] < num_classes) {
+            one_hot[i][labels[i]] = 1.0;
+        } else {
+            printf("Invalid label %d at index %d\n", labels[i], i);
+        }
+    }
+}
+
+void train_mnist(void) {
+
+    // Train a multi-layer perceptron on the MNIST dataset
+
+    // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
+    // After calling the following loader function, the following variables exist in the global namespace:
+    // train image : train_image[60000][784] (type: double, normalized, flattened)
+    // train label : train_label[60000] (type: int)
+    // test image : test_image[10000][784] (type: double, normalized, flattened)
+    // test label : test_label[10000] (type: int)
+    const int training_size = 5;
+    const int test_size = 10000;
+    
+    const int feature_dimension = 784;
+    const int hidden_count = 15;
+    const int label_dimension = 10;
+    load_mnist();
+
+    // Still a simple architecture, consisting of 784 input nodes (mapping the resolution of the input data), 15 hidden nodes, and 10 output nodes.
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, sigmoid_activation, derivative_sigmoid_activation, 
+    sigmoid_activation, derivative_sigmoid_activation, 1);
+
+    // One-hot encode the labels into a 10 dimensional vector
+    // A value of 3 gets encoded to [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+    double train_label_onehot[training_size][label_dimension];
+    onehot_encode(train_label, training_size, label_dimension, train_label_onehot);
+
+    // Diagnostics:
+    // for (int i = 0; i < training_size; i++) {
+    //     printf("%d\n", train_label[i]);
+    //     printf("One-hot encoded label: ");
+    //     for (int j = 0; j < label_dimension; j++) {
+    //         printf("%d ", train_label_onehot[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+
+    // train_mlp(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, 0.0001);
+
+    destroy_mlp(mlp);
+
+    return;
+}
 // Array of model mappings
 ModelMapping modelMappings[] = {
     // Single Perceptrons:
@@ -634,7 +693,9 @@ ModelMapping modelMappings[] = {
     {"model_x2plus1_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x + 1", model_x2plus1_mlp},
     {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR},
     // Deep Neural Networks, Multiple Output:
-    {"model_2dout", "A multi-layer perceptron, outputing a 2d vector", model_2dout}
+    {"model_2dout", "A multi-layer perceptron, outputing a 2d vector", model_2dout},
+    // Realworld Dataset:
+    {"train_mnist", "Train a multi-layer perceptron on the MNIST dataset", train_mnist}
 };
 
 int main(int argc, char *argv[]) {
