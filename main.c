@@ -535,7 +535,7 @@ void model_2dout(void) {
     // y_2 = 2(x_1 + x_2)
 
     const int hidden_count = 12;
-    const int epoch_count = 1000;
+    const int epoch_count = 50000;
 
     const double training_features[][2] = {
         {1, 1}, {2, 2}, {3, 3}, {4, 4},
@@ -549,8 +549,8 @@ void model_2dout(void) {
     int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
     int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
 
-    multilayer_perceptron_t *mlp = init_mlp(2, 12, 2, linear_activation, derivative_linear_activation, 
-        linear_activation, derivative_linear_activation, epoch_count);
+    multilayer_perceptron_t *mlp = init_mlp(2, 12, 2, relu_activation, derivative_relu_activation, 
+        relu_activation, derivative_relu_activation, epoch_count);
 
     printf("\n");
 

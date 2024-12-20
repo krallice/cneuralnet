@@ -72,7 +72,7 @@ double relu_activation(double x) {
 }
 
 double derivative_relu_activation(double x) {
-    return x > 0 ? 1 : 0;
+    return x >= 0 ? 1 : 0;
 }
 
 // Sigmoid
