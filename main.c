@@ -640,8 +640,6 @@ void onehot_encode(const int *labels, int num_labels, int num_classes, double on
 
 void mnist_train(void) {
 
-    // Train 784-15-10 neural network on the MNIST dataset
-
     // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
     // After calling the following loader function, the following variables exist in the global namespace:
     // train image : train_image[60000][784] (type: double, normalized, flattened)
@@ -649,24 +647,24 @@ void mnist_train(void) {
     // test image : test_image[10000][784] (type: double, normalized, flattened)
     // test label : test_label[10000] (type: int)
     const int training_size = 60000;
-    const int epoch_count = 100;
+    const int epoch_count = 30;
+    const double learning_rate = 0.0001;
     
     const int feature_dimension = 784;
-    const int hidden_count = 15;
+    const int hidden_count = 40;
     const int label_dimension = 10;
     load_mnist();
 
-    // Still a simple architecture, consisting of 784 input nodes (mapping the resolution of the input data), 15 hidden nodes, and 10 output nodes.
-    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, linear_activation, derivative_linear_activation, 
-    linear_activation, derivative_linear_activation, epoch_count);
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, relu_activation, derivative_relu_activation, 
+    relu_activation, derivative_relu_activation, epoch_count);
 
     printf("\n");
 
     printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
     printf("Model: mnist_train\n");
     printf("Aim: Train a feed forward neural network to model the handwritten MNIST dataset\n");
-    printf("Architecture: 748 Input Nodes, 15 Hidden Nodes, 10 Output Nodes.\n");
-    printf("Hidden Activation: Linear, Output Activation: Linear\n");
+    printf("Architecture: 748 Input Nodes, %d Hidden Nodes, 10 Output Nodes.\n", hidden_count);
+    printf("Hidden Activation: ReLU, Output Activation: ReLU\n");
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
     printf("\n");
     printf("Training Size (n): %d\n", training_size);
@@ -693,7 +691,7 @@ void mnist_train(void) {
     //     printf("\n");
     // }
 
-    train_mlp(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, 0.0001);
+    train_mlp(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, learning_rate);
 
     printf("\n\n");
 
@@ -722,21 +720,20 @@ void mnist_test(void) {
     const int epoch_count = 0;
     
     const int feature_dimension = 784;
-    const int hidden_count = 15;
+    const int hidden_count = 40;
     const int label_dimension = 10;
     load_mnist();
 
-    // Still a simple architecture, consisting of 784 input nodes (mapping the resolution of the input data), 15 hidden nodes, and 10 output nodes.
-    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, linear_activation, derivative_linear_activation, 
-    linear_activation, derivative_linear_activation, epoch_count);
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, relu_activation, derivative_relu_activation, 
+    relu_activation, derivative_relu_activation, epoch_count);
 
     printf("\n");
 
     printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
     printf("Model: mnist_test\n");
     printf("Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.\n");
-    printf("Architecture: 748 Input Nodes, 15 Hidden Nodes, 10 Output Nodes.\n");
-    printf("Hidden Activation: Linear, Output Activation: Linear\n");
+    printf("Architecture: 748 Input Nodes, %d Hidden Nodes, 10 Output Nodes.\n", hidden_count);
+    printf("Hidden Activation: ReLU, Output Activation: ReLU\n");
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
     printf("\n");
     printf("Testing Size (n): %d\n", testing_size);
