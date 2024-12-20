@@ -423,13 +423,13 @@ void model_x2plus1_mlp(void) {
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
 
     printf("Training Strategy:\n");
-    printf("\t500 epochs of y = 2x + 1 where x = {1..8} \n");
+    printf("\t10000 epochs of y = 2x + 1 where x = {1..8} \n");
     
     printf("\n\n");
 
     printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
     printf("Model execution starting now ...\n");
-    printf("Training 500 epochs now.\n");
+    printf("Training 10000 epochs now.\n");
 
     train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
 
@@ -527,15 +527,114 @@ void model_XOR(void) {
     destroy_mlp(mlp);
 }
 
+void model_2dout(void) {
+
+    // 2 -> 12 -> 2 architecture
+    // Model the following relationship:
+    // y_1 = x_1 + x_2
+    // y_2 = 2(x_1 + x_2)
+
+    const int hidden_count = 12;
+    const int epoch_count = 1000;
+
+    const double training_features[][2] = {
+        {1, 1}, {2, 2}, {3, 3}, {4, 4},
+        {1, 4}, {2, 4}, {3, 5}, {4, 5}
+    };
+    const double training_labels[][2] = {
+        {2, 4}, {4, 8}, {6, 12}, {8, 16},
+        {5, 10}, {6, 12}, {8, 16}, {9, 18}
+    };
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
+
+    multilayer_perceptron_t *mlp = init_mlp(2, 12, 2, linear_activation, derivative_linear_activation, 
+        linear_activation, derivative_linear_activation, epoch_count);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: model_2dout\n");
+    printf("Aim: Train a 2-12-2 mlp to model the following R^2 -> R^2 function\n");
+    printf("\t- y_1 = x_1 + x_2\n");
+    printf("\t- y_2 = 2(x_1 + x_2)\n");
+    printf("Architecture: 2 Input Nodes, 2 Hidden Nodes, 2 Output Nodes.\n");
+    printf("Input: A 2 dimensional input vector, x\n");
+    printf("\t- x_1: Input value 1\n");
+    printf("\t- x_2: Input value 2\n");
+    printf("Activation: Linear\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+
+    printf("Training Strategy:\n");
+    printf("\t %d epochs of 8 training entries.\n", epoch_count);
+    
+    printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training %d epochs now.\n", epoch_count);
+
+    printf("label dimension: %d \n", label_dimension);
+
+    train_mlp(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
+
+    printf("Training complete.\n");
+
+    printf("\n\n");
+
+    printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    for (int i = 0; i < hidden_count; i++) {
+        printf("Hidden node %d x_1 weight: %f x_2 weight: %f bias: %f\n", i, mlp->p_hidden1[i]->weights[0], mlp->p_hidden1[i]->weights[1], mlp->p_hidden1[i]->bias_weight);
+    }
+    printf("Output node 0 x_1 weight: %f x_2 weight: %f bias: %f\n", mlp->p_output[0]->weights[0], mlp->p_output[0]->weights[1], mlp->p_output[0]->bias_weight);
+    printf("Output node 1 x_1 weight: %f x_2 weight: %f bias: %f\n", mlp->p_output[1]->weights[0], mlp->p_output[1]->weights[1], mlp->p_output[1]->bias_weight);
+
+    printf("\n\n");
+
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+
+    const double testing_features[][2] = {
+        {2, 3}, {8, 2}, {8, 4}, {5, 1},
+        {10, 10}, {20, 10}, {1, 1}, {8, 8}
+    };
+    const double testing_labels[][2] = {
+        {5, 10}, {10, 20}, {12, 24}, {6, 12},
+        {20, 40}, {30, 60}, {2, 4}, {16, 32}
+    };
+
+    for (int i = 0; i < feature_count; i++) {
+        
+        // Predict:
+        mlp_feedforward(mlp, testing_features[i]);
+
+        // Round to nearest whole number:
+        mlp->p_output_output[0] = round(mlp->p_output_output[0]);
+        mlp->p_output_output[1] = round(mlp->p_output_output[1]);
+
+        printf("[ %s%02d %s%s ]: Input: (%0.0f, %0.0f) Expected: (%0.0f, %0.0f) Prediction: (%f, %f)\n", 
+            (testing_labels[i][0] == (int)mlp->p_output_output[0] && testing_labels[i][1] == (int)mlp->p_output_output[1]) ? GREEN : RED, i + 1,
+            (testing_labels[i][0] == (int)mlp->p_output_output[0] && testing_labels[i][1] == (int)mlp->p_output_output[1]) ? "SUCCESS" : "FAILURE", RESET,
+            testing_features[i][0], testing_features[i][1], testing_labels[i][0], testing_labels[i][1], mlp->p_output_output[0], mlp->p_output_output[1]);
+    }
+
+    destroy_mlp(mlp);
+    return;
+}
+
 // Array of model mappings
 ModelMapping modelMappings[] = {
+    // Single Perceptrons:
     {"model_x_gt_9", "A single dimensional input to a single perceptron, trained on the dataset of x > 9", model_x_gt_9},
     {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
     {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
+    // Deep Neural Networks, Single Output:
     {"model_4x2_mlp", "1 hidden, 1 output, trained to learn the output of equation 4x2", model_4x2_mlp},
     {"model_x2_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x", model_x2_mlp},
     {"model_x2plus1_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x + 1", model_x2plus1_mlp},
-    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR}
+    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR},
+    // Deep Neural Networks, Multiple Output:
+    {"model_2dout", "A multi-layer perceptron, outputing a 2d vector", model_2dout}
 };
 
 int main(int argc, char *argv[]) {
