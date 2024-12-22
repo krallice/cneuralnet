@@ -20,25 +20,30 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 - *TODO: Mini-Batch Gradient Descent*
 - *TODO: Batch Gradient Descent*
 
-**Usage Example Dump**
+## Models Implemented
 
-```
-# ./main 
-Usage: ./main <modelName>
-Valid models:
-- model_x_gt_9 - A single dimensional input to a single perceptron, trained on the dataset of x > 9
-- model_linear - A two dimensional input perceptron, trained to model y = x/2 + 5
-- model_AND - A two dimensional input perceptron, trained to operate as an AND gate
-- model_4x2_mlp - FeedForward Neural Network (1-1-1) trained to learn the output of equation 4x2
-- model_x2_mlp - FNN (1-1-1) trained to learn the equation y = 2x
-- model_x2plus1_mlp - FNN (1-1-1) trained to learn the equation y = 2x + 1
-- model_XOR - FNN modelling the XOR function
+**Perceptron/Single Neuron**
+- model_x_gt_9 - A single dimensional input to a single perceptron, trained on the dataset of ```x > 9```
+- model_linear - A two dimensional input perceptron, trained to model ```y = x/2 + 5```
+- model_AND - A two dimensional input perceptron, trained to operate as an ```AND``` gate
+
+**Feed Forward Neural Network (1 Hidden Layer)**
+- model_4x2_mlp - FeedForward Neural Network (1-1-1) trained to learn the output of equation ```4 x 2```
+- model_x2_mlp - FNN (1-1-1) trained to learn the equation ```y = 2x```
+- model_x2plus1_mlp - FNN (1-1-1) trained to learn the equation ```y = 2x + 1```
+- model_XOR - FNN modelling the ```XOR``` function
 - model_2dout - FNN, outputing a 2d vector
 - mnist_train - Train a FNN on the MNIST dataset
 - mnist_test - Inference on a FNN for the MNIST dataset
 
+**Feed Forward Neural Network (2 Hidden Layers)**
+- model_x2plus1_2fnn - 2 Layer FNN (1-1-1-1) trained to learn the equation ```y = 2x + 1```
+- mnist2_train - Train a FNN on the MNIST dataset
+- mnist2_test - Inference on a FNN for the MNIST dataset
 
+## Usage Example Dump
 
+```
 # ./main mnist_test
 
 [ DETAILS ]
