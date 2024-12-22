@@ -66,13 +66,23 @@ double derivative_linear_activation(double x) {
 }
 
 // Rectified Linear Unit:
-// Nice properties from it being close to linear (TODO: describe why later)
+// Preferred over linear activation functions as it allows the model to learn non-linear relationships:
 double relu_activation(double x) {
     return x > 0 ? x : 0;
 }
 
 double derivative_relu_activation(double x) {
     return x >= 0 ? 1 : 0;
+}
+
+// Leaky ReLU:
+// Avoids the 'dying ReLU' problem where neurons effectively die and stop learning because they always output 0:
+double leaky_relu_activation(double x) {
+    return x > 0 ? x : 0.01 * x;
+}
+
+double derivative_leaky_relu_activation(double x) {
+    return x > 0 ? 1 : 0.01;
 }
 
 // Sigmoid
