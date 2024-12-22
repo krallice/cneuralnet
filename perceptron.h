@@ -29,6 +29,9 @@ double derivative_linear_activation(double x);
 double relu_activation(double x);
 double derivative_relu_activation(double x);
 
+double leaky_relu_activation(double x);
+double derivative_leaky_relu_activation(double x);
+
 double sigmoid_activation(double x);
 double derivative_sigmoid_activation(double x);
 

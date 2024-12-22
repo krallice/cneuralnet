@@ -12,7 +12,7 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 
 - Rosenblatt Perceptron
 - Feed Forward Neural Network (1 Hidden Layer)
-- *TODO:* Feed Forward Neural Network (2 Hidden Layers)
+- Feed Forward Neural Network (2 Hidden Layers)
 
 **Learning Methods**
 
@@ -20,45 +20,61 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 - *TODO: Mini-Batch Gradient Descent*
 - *TODO: Batch Gradient Descent*
 
-**Usage Example Dump**
+**Activation Functions**
 
-```
-# ./main 
-Usage: ./main <modelName>
-Valid models:
-- model_x_gt_9 - A single dimensional input to a single perceptron, trained on the dataset of x > 9
-- model_linear - A two dimensional input perceptron, trained to model y = x/2 + 5
-- model_AND - A two dimensional input perceptron, trained to operate as an AND gate
-- model_4x2_mlp - FeedForward Neural Network (1-1-1) trained to learn the output of equation 4x2
-- model_x2_mlp - FNN (1-1-1) trained to learn the equation y = 2x
-- model_x2plus1_mlp - FNN (1-1-1) trained to learn the equation y = 2x + 1
-- model_XOR - FNN modelling the XOR function
+- Linear
+- ReLU
+- Leaky ReLU
+- Sigmoid
+
+**Weight Initialisation**
+
+- Random (Uniform Distribution)
+
+## Models Implemented
+
+**Perceptron/Single Neuron**
+- model_x_gt_9 - A single dimensional input to a single perceptron, trained on the dataset of ```x > 9```
+- model_linear - A two dimensional input perceptron, trained to model ```y = x/2 + 5```
+- model_AND - A two dimensional input perceptron, trained to operate as an ```AND``` gate
+
+**Feed Forward Neural Network (1 Hidden Layer)**
+- model_4x2_mlp - FeedForward Neural Network (1-1-1) trained to learn the output of equation ```4 x 2```
+- model_x2_mlp - FNN (1-1-1) trained to learn the equation ```y = 2x```
+- model_x2plus1_mlp - FNN (1-1-1) trained to learn the equation ```y = 2x + 1```
+- model_XOR - FNN modelling the ```XOR``` function
 - model_2dout - FNN, outputing a 2d vector
 - mnist_train - Train a FNN on the MNIST dataset
 - mnist_test - Inference on a FNN for the MNIST dataset
 
+**Feed Forward Neural Network (2 Hidden Layers)**
+- model_x2plus1_2fnn - 2 Hidden Layer FNN (1-8-8-1) trained to learn the equation ```y = 2x + 1```
+- mnist2_train - Train a FNN on the MNIST dataset
+- mnist2_test - Inference on a FNN for the MNIST dataset
 
+## Usage Example Dump
 
-# ./main mnist_test
+```
+# ./main mnist2_test
 
 [ DETAILS ]
-Model: mnist_test
+Model: mnist2_test
 Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.
-Architecture: 748 Input Nodes, 40 Hidden Nodes, 10 Output Nodes.
-Hidden Activation: ReLU, Output Activation: ReLU
+Architecture: 784 Input Nodes, 128 Hidden1 Nodes, 64 Hidden2 Nodes, 10 Output Nodes.
+Hidden Activation: Leaky ReLU, Output Activation: Leaky ReLU
 Loss Function: Mean Squared Error + Gradient Descent + Back Propagation 
 
 Testing Size (n): 10000
 
 
 [ LOADING WEIGHTS ]
-Loading Model Weights from weights.bin
+Loading Model Weights from weights2.bin
 
 
 [ PREDICTION RESULTS ]
 Testing set size: 10000
-Success count: 8579
-Success rate: 85.79%
+Success count: 9470
+Success rate: 94.70%
 
 
 

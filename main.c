@@ -5,6 +5,7 @@
 
 #include "perceptron.h"
 #include "mlp.h"
+#include "mlp2.h"
 #include "mnist.h"
 
 #define RED "\x1b[31m"
@@ -409,8 +410,8 @@ void model_x2plus1_mlp(void) {
          x_1    ·   w_1  -> (linear activation) ·   w_2  -> (linear activation)      
     (Input Node)           (Hidden Node)            (Output Node)
     */
-    multilayer_perceptron_t *mlp = init_mlp(1, 1, 1, linear_activation, derivative_linear_activation, 
-        linear_activation, derivative_linear_activation, 10000);
+    multilayer_perceptron_t *mlp = init_mlp(1, 1, 1, leaky_relu_activation, derivative_leaky_relu_activation, 
+        leaky_relu_activation, derivative_leaky_relu_activation, 100000);
 
     printf("\n");
 
@@ -420,7 +421,7 @@ void model_x2plus1_mlp(void) {
     printf("Architecture: Multilayer Perceptron (Shallow).\n\t1 Input Node, 1 Hidden Node, 1 Output Node.\n");
     printf("Input: A one dimensional input vector, x\n");
     printf("\t- x_1: Input value\n");
-    printf("Activation: Linear Activation Function (No shaping)\n");
+    printf("Activation: ReLU Activation Function\n");
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
 
     printf("Training Strategy:\n");
@@ -623,6 +624,105 @@ void model_2dout(void) {
     return;
 }
 
+void model_x2plus1_2fnn(void) {
+
+    const double training_features[][1] = {
+        {1}, {2}, {3}, {4},
+        {5}, {6}, {7}, {8}
+    };
+    const double training_labels[][1] = {
+        {3}, {5}, {7}, {9},
+        {11}, {13}, {15}, {17}
+    };
+    int feature_count = sizeof(training_features) / sizeof(training_features[0]);
+    int feature_dimension = sizeof(training_features[0]) / sizeof(training_features[0][0]);
+    int label_dimension = sizeof(training_labels[0]) / sizeof(training_labels[0][0]);
+
+    multilayer_perceptron2_t *mlp = init_mlp2(1, 8, 8, 1, leaky_relu_activation, derivative_leaky_relu_activation,
+        leaky_relu_activation, derivative_leaky_relu_activation,
+        leaky_relu_activation, derivative_leaky_relu_activation, 1000);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: model_x2plus1_2fnn\n");
+    printf("Aim: Train a 1-8-8-1 FNN to double an y input scalar (ie, learn the equation y = 2x + 1.\n");
+    printf("Architecture: Feed Forward Neural Network.\n\t1 Input Node, 8 Hidden1 Nodes, 8 Hidden2 Nodes, 1 Output Node.\n");
+    printf("Input: A one dimensional input vector, x\n");
+    printf("\t- x_1: Input value\n");
+    printf("Activation: Leaky ReLU\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+
+    printf("Training Strategy:\n");
+    printf("\t10000 epochs of y = 2x + 1 where x = {1..8} \n");
+    
+    printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+
+    // printf("Initial weights and biases:\n");
+    // printf("Hidden1 node1 11 weight: %f bias: %f\n", mlp->p_hidden1[0]->weights[0], mlp->p_hidden1[0]->bias_weight);
+    // printf("Hidden2 node1 11 weight: %f bias: %f\n", mlp->p_hidden2[0]->weights[0], mlp->p_hidden2[0]->bias_weight);
+    // printf("Output  node1 11 weight: %f bias: %f\n", mlp->p_output[0]->weights[0], mlp->p_output[0]->bias_weight);
+    // printf("\n");
+
+    printf("Model execution starting now ...\n");
+    printf("Training 10000 epochs now.\n");
+
+    train_mlp2(mlp, feature_count, feature_dimension, training_features, label_dimension, training_labels, 0.01);
+
+    printf("Training complete.\n");
+
+    printf("\n\n");
+
+    printf("[ %sTRAINING RESULTS%s ]\n", YELLOW, RESET);
+    // printf("Hidden1 node1 weight: %f bias: %f\n", mlp->p_hidden1[0]->weights[0], mlp->p_hidden1[0]->bias_weight);
+    // printf("Hidden1 node2 weight: %f bias: %f\n", mlp->p_hidden1[1]->weights[0], mlp->p_hidden1[1]->bias_weight);
+
+    // printf("Hidden2 node1 11 weight: %f 21 weight: %f bias: %f\n", mlp->p_hidden2[0]->weights[0], mlp->p_hidden2[0]->weights[1], mlp->p_hidden2[0]->bias_weight);
+    // printf("Hidden2 node2 12 weight: %f 22 weight: %f bias: %f\n", mlp->p_hidden2[1]->weights[0], mlp->p_hidden2[1]->weights[1], mlp->p_hidden2[1]->bias_weight);
+
+    // printf("Output node 11 weight: %f 21 weight: %f bias: %f\n", mlp->p_output[0]->weights[0],mlp->p_output[0]->weights[1], mlp->p_output[0]->bias_weight);
+
+    // printf("Hidden1 node1 11 weight: %f bias: %f\n", mlp->p_hidden1[0]->weights[0], mlp->p_hidden1[0]->bias_weight);
+    // printf("Hidden2 node1 11 weight: %f bias: %f\n", mlp->p_hidden2[0]->weights[0], mlp->p_hidden2[0]->bias_weight);
+    // printf("Output  node1 11 weight: %f bias: %f\n", mlp->p_output[0]->weights[0], mlp->p_output[0]->bias_weight);
+
+    printf("\n\n");
+
+    printf("[ %sPREDICTION%s ]\n", YELLOW, RESET);
+
+    for (double i = 1.0; i <= 8; i++) {
+        const double prediction_features[] = {i};
+        mlp2_feedforward(mlp, prediction_features);
+
+        // Round up to 2 decimal places:
+        const double result = round(mlp->p_output_output[0] * 100) / 100.0;
+        const double expected = (i * 2) + 1;
+
+        printf("[ %s%s%s ]: Input x_1: %f Expected: %f Prediction: %f\n",
+            result == expected ? GREEN : RED, result == expected ? "SUCCESS" : "FAILURE", RESET,
+            prediction_features[0], expected, result);
+    }
+
+    for (double i = 100.0; i <= 120; i++) {
+        const double prediction_features[] = {i};
+        mlp2_feedforward(mlp, prediction_features);
+
+        // Round to the nearest integer val:
+        const double result = round(mlp->p_output_output[0]);
+        const double expected = (i * 2) + 1;
+
+        printf("[ %s%s%s ]: Input x_1: %f Expected: %f Prediction: %f\n",
+            result == expected ? GREEN : RED, result == expected ? "SUCCESS" : "FAILURE", RESET,
+            prediction_features[0], expected, result);
+    }
+    
+    destroy_mlp2(mlp);
+    return;
+}
+
+// MNIST Helper Function:
 void onehot_encode(const int *labels, int num_labels, int num_classes, double one_hot[][10]) {
 
     // Zeroise:
@@ -638,6 +738,8 @@ void onehot_encode(const int *labels, int num_labels, int num_classes, double on
     }
 }
 
+
+// Single Hidden Layer FNN MNIST Solver:
 void mnist_train(void) {
 
     // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
@@ -647,16 +749,17 @@ void mnist_train(void) {
     // test image : test_image[10000][784] (type: double, normalized, flattened)
     // test label : test_label[10000] (type: int)
     const int training_size = 60000;
-    const int epoch_count = 30;
+    const int epoch_count = 15;
     const double learning_rate = 0.0001;
     
     const int feature_dimension = 784;
-    const int hidden_count = 40;
+    const int hidden_count = 60;
     const int label_dimension = 10;
     load_mnist();
 
-    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, relu_activation, derivative_relu_activation, 
-    relu_activation, derivative_relu_activation, epoch_count);
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, 
+    leaky_relu_activation, derivative_leaky_relu_activation, 
+    leaky_relu_activation, derivative_leaky_relu_activation, epoch_count);
 
     printf("\n");
 
@@ -664,7 +767,7 @@ void mnist_train(void) {
     printf("Model: mnist_train\n");
     printf("Aim: Train a feed forward neural network to model the handwritten MNIST dataset\n");
     printf("Architecture: 748 Input Nodes, %d Hidden Nodes, 10 Output Nodes.\n", hidden_count);
-    printf("Hidden Activation: ReLU, Output Activation: ReLU\n");
+    printf("Hidden Activation: Leaky ReLU, Output Activation: Leaky ReLU\n");
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
     printf("\n");
     printf("Training Size (n): %d\n", training_size);
@@ -720,23 +823,23 @@ void mnist_test(void) {
     const int epoch_count = 0;
     
     const int feature_dimension = 784;
-    const int hidden_count = 40;
+    const int hidden_count = 60;
     const int label_dimension = 10;
     load_mnist();
 
-    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, relu_activation, derivative_relu_activation, 
-    relu_activation, derivative_relu_activation, epoch_count);
+    multilayer_perceptron_t *mlp = init_mlp(feature_dimension, hidden_count, label_dimension, 
+    leaky_relu_activation, derivative_leaky_relu_activation,
+    leaky_relu_activation, derivative_leaky_relu_activation, epoch_count);
 
     printf("\n");
 
     printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
     printf("Model: mnist_test\n");
-    printf("Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.\n");
+    printf("Aim: Train a feed forward neural network to model the handwritten MNIST dataset\n");
     printf("Architecture: 748 Input Nodes, %d Hidden Nodes, 10 Output Nodes.\n", hidden_count);
-    printf("Hidden Activation: ReLU, Output Activation: ReLU\n");
+    printf("Hidden Activation: Leaky ReLU, Output Activation: Leaky ReLU\n");
     printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
     printf("\n");
-    printf("Testing Size (n): %d\n", testing_size);
 
     printf("\n\n");
 
@@ -785,23 +888,175 @@ void mnist_test(void) {
     return;
 }
 
+// Two Hidden Layer FNN MNIST Solver:
+void mnist2_train(void) {
+
+    // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
+    // After calling the following loader function, the following variables exist in the global namespace:
+    // train image : train_image[60000][784] (type: double, normalized, flattened)
+    // train label : train_label[60000] (type: int)
+    // test image : test_image[10000][784] (type: double, normalized, flattened)
+    // test label : test_label[10000] (type: int)
+    const int training_size = 60000;
+    const int epoch_count = 10;
+    const double learning_rate = 0.001;
+
+    const int feature_dimension = 784;
+    const int hidden1_count = 128;
+    const int hidden2_count = 64;
+    const int label_dimension = 10;
+    load_mnist();
+
+    multilayer_perceptron2_t *mlp = init_mlp2(feature_dimension, hidden1_count, hidden2_count, label_dimension, 
+        leaky_relu_activation, derivative_leaky_relu_activation, 
+        leaky_relu_activation, derivative_leaky_relu_activation, 
+        leaky_relu_activation, derivative_leaky_relu_activation, epoch_count);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: mnist2_train\n");
+    printf("Aim: Train a feed forward neural network to model the handwritten MNIST dataset\n");
+    printf("Architecture: 784 Input Nodes, %d Hidden1 Nodes, %d Hidden2 Nodes, 10 Output Nodes.\n", hidden1_count, hidden2_count);
+    printf("Hidden Activation: Leaky ReLU, Output Activation: Leaky ReLU\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+    printf("\n");
+    printf("Training Size (n): %d\n", training_size);
+    printf("Epoch Count: %d\n", epoch_count);
+
+    printf("\n\n");
+
+    printf("[ %sTRAINING%s ]\n", YELLOW, RESET);
+    printf("Model execution starting now ...\n");
+    printf("Training %d epochs now.\n", epoch_count);
+
+    // One-hot encode the labels into a 10 dimensional vector
+    // A value of 3 gets encoded to [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+    double train_label_onehot[training_size][label_dimension];
+    onehot_encode(train_label, training_size, label_dimension, train_label_onehot);
+
+    train_mlp2(mlp, training_size, feature_dimension, train_image, label_dimension, train_label_onehot, learning_rate);
+
+    printf("\n\n");
+
+    printf("[ %sSAVING WEIGHTS%s ]\n", YELLOW, RESET);
+    printf("Saving Model Weights to weights2.bin\n");
+    printf("\n\n");
+
+    save_mlp2_weights(mlp, "weights2.bin");
+    destroy_mlp2(mlp);
+
+    printf("[ %sCOMPLETE%s ]\n", YELLOW, RESET);
+    printf("\n\n");
+
+    return;
+}
+
+void mnist2_test(void) {
+
+    // Use the included mnist.h functions to load the dataset as this is not the interesting part of our problem.
+    // After calling the following loader function, the following variables exist in the global namespace:
+    // train image : train_image[60000][784] (type: double, normalized, flattened)
+    // train label : train_label[60000] (type: int)
+    // test image : test_image[10000][784] (type: double, normalized, flattened)
+    // test label : test_label[10000] (type: int)
+    const int testing_size = 10000;
+    const int epoch_count = 0;
+
+    const int feature_dimension = 784;
+    const int hidden1_count = 128;
+    const int hidden2_count = 64;
+    const int label_dimension = 10;
+    load_mnist();
+
+    multilayer_perceptron2_t *mlp = init_mlp2(feature_dimension, hidden1_count, hidden2_count, label_dimension, 
+        leaky_relu_activation, derivative_leaky_relu_activation, 
+        leaky_relu_activation, derivative_leaky_relu_activation, 
+        leaky_relu_activation, derivative_leaky_relu_activation, epoch_count);
+
+    printf("\n");
+
+    printf("[ %sDETAILS%s ]\n", YELLOW, RESET);
+    printf("Model: mnist2_test\n");
+    printf("Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.\n");
+    printf("Architecture: 784 Input Nodes, %d Hidden1 Nodes, %d Hidden2 Nodes, 10 Output Nodes.\n", hidden1_count, hidden2_count);
+    printf("Hidden Activation: Leaky ReLU, Output Activation: Leaky ReLU\n");
+    printf("Loss Function: Mean Squared Error + Gradient Descent + Back Propagation \n");
+    printf("\n");
+    printf("Testing Size (n): %d\n", testing_size);
+
+    printf("\n\n");
+
+    printf("[ %sLOADING WEIGHTS%s ]\n", YELLOW, RESET);
+    printf("Loading Model Weights from weights2.bin\n");
+    printf("\n\n");
+
+    load_mlp2_weights(mlp, "weights2.bin");
+
+    double test_label_onehot[testing_size][label_dimension];
+    onehot_encode(test_label, testing_size, label_dimension, test_label_onehot);
+
+    int success_count = 0;
+    int prediction = -1;
+    for (int i = 0; i < testing_size; i++) {
+        mlp2_feedforward(mlp, test_image[i]);
+
+        // Undo the onehot encoding:
+        prediction = -1;
+        for (int j = 0; j < label_dimension; j++) {
+            // printf("Output: %f\n", mlp->p_output_output[j]);
+            if (round(mlp->p_output_output[j]) > prediction) {
+                prediction = j;
+            }
+        }
+
+        if (test_label[i] == prediction) {
+            success_count++;
+        }
+
+        // printf("[ %s%02d/%02d %s%s ]: Input Image: %d Expected: %d Prediction: %d\n", 
+        //     (test_label[i] == prediction) ? GREEN : RED, i + 1, testing_size,
+        //     (test_label[i] == prediction) ? "SUCCESS" : "FAILURE", RESET,
+        //     i + 1, test_label[i], prediction);
+    }
+
+    printf("[ %sPREDICTION RESULTS%s ]\n", YELLOW, RESET);
+    printf("Testing set size: %d\n", testing_size);
+    printf("Success count: %d\n", success_count);
+    printf("Success rate: %0.2f%%\n", ((double)success_count / testing_size) * 100);
+
+    destroy_mlp2(mlp);
+
+    return;
+}
+
 // Array of model mappings
 ModelMapping modelMappings[] = {
+
     // Single Perceptrons:
     {"model_x_gt_9", "A single dimensional input to a single perceptron, trained on the dataset of x > 9", model_x_gt_9},
     {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
     {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
+
     // Deep Neural Networks, Single Output:
     {"model_4x2_mlp", "FeedForward Neural Network (1-1-1) trained to learn the output of equation 4x2", model_4x2_mlp},
     {"model_x2_mlp", "FNN (1-1-1) trained to learn the equation y = 2x", model_x2_mlp},
     {"model_x2plus1_mlp", "FNN (1-1-1) trained to learn the equation y = 2x + 1", model_x2plus1_mlp},
     {"model_XOR", "FNN modelling the XOR function", model_XOR},
-    // Deep Neural Networks, Multiple Output:
+
+    // Deep Neural Networks, 2d output
     {"model_2dout", "FNN, outputing a 2d vector", model_2dout},
-    // Realworld Dataset:
+
+    // Deep Neural Networks, 2 Hidden Layer:
+    {"model_x2plus1_2fnn", "2 Layer FNN (1-8-8-1) trained to learn the equation y = 2x + 1", model_x2plus1_2fnn},
+
+    // Realworld Dataset (1Layer):
     {"mnist_train", "Train a FNN on the MNIST dataset", mnist_train},
-    {"mnist_test", "Inference on a FNN for the MNIST dataset", mnist_test}
-    
+    {"mnist_test", "Inference on a FNN for the MNIST dataset", mnist_test},
+
+    // Realworld Dataset, (2Layer):
+    {"mnist2_train", "Train a FNN on the MNIST dataset", mnist2_train},
+    {"mnist2_test", "Inference on a FNN for the MNIST dataset", mnist2_test}
 };
 
 int main(int argc, char *argv[]) {

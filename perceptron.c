@@ -14,11 +14,11 @@ perceptron_t *init_perceptron(const int input_count, double (*activation_functio
     // Randomly set the starting weights on a value between -1 and 1
     p->weights = malloc(sizeof(double) * input_count);
     for (int i = 0; i < input_count; i++) {
-        p->weights[i] = (rand() / (double)RAND_MAX * 2 - 1) * 0.01;
+        p->weights[i] = (rand() / (double)RAND_MAX * 2 - 1) * 0.1;
     }
 
     // Assign the Biases weight between -1 and 1:
-    p->bias_weight = (rand() / (double)RAND_MAX * 2 - 1) * 0.01;
+    p->bias_weight = (rand() / (double)RAND_MAX * 2 - 1) * 0.1;
 
     p->input_count = input_count;
     p->activation_function = activation_function;
@@ -66,13 +66,23 @@ double derivative_linear_activation(double x) {
 }
 
 // Rectified Linear Unit:
-// Nice properties from it being close to linear (TODO: describe why later)
+// Preferred over linear activation functions as it allows the model to learn non-linear relationships:
 double relu_activation(double x) {
     return x > 0 ? x : 0;
 }
 
 double derivative_relu_activation(double x) {
     return x >= 0 ? 1 : 0;
+}
+
+// Leaky ReLU:
+// Avoids the 'dying ReLU' problem where neurons effectively die and stop learning because they always output 0:
+double leaky_relu_activation(double x) {
+    return x > 0 ? x : 0.01 * x;
+}
+
+double derivative_leaky_relu_activation(double x) {
+    return x > 0 ? 1 : 0.01;
 }
 
 // Sigmoid
