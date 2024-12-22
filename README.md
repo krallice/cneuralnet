@@ -1,5 +1,68 @@
+# Network Networks (In C)
+
+This project is an attempt to document my understanding of the logic and mathematics behind neural networks, and potentially other ML techniques. To truly root my understanding of these systems, I've embarked upon the challenge to build/model them in C, using no external libraries like numpy or scikit. 
+
+I've commited to only writing code if I can explain its reason for existing - no blindly copying or translating source code from other already written sources. The code is often written consulting the maths behind the algorithms, and I've taken lengths to ensure the code is adequately documented, including my thoughts as I go along.
+
+I started this project with the intent to remove the "magic" from deep learning, however as I've come to understand it, and the maths behind how deep learning models operate, I've only come to see them as more impressive and magic.
+
+The aim isnt to build performant or perfect code. This is a live documentation of my learning processing.
+
+**Architectures**
+
+- Rosenblatt Perceptron
+- Feed Forward Neural Network (1 Hidden Layer)
+- *TODO:* Feed Forward Neural Network (2 Hidden Layers)
+
+**Learning Methods**
+
+- Stochastic Gradient Descent
+- *TODO: Mini-Batch Gradient Descent*
+- *TODO: Batch Gradient Descent*
+
+**Usage Example Dump**
+
 ```
-# ./build.sh && ./main model_x_gt_9
+# ./main 
+Usage: ./main <modelName>
+Valid models:
+- model_x_gt_9 - A single dimensional input to a single perceptron, trained on the dataset of x > 9
+- model_linear - A two dimensional input perceptron, trained to model y = x/2 + 5
+- model_AND - A two dimensional input perceptron, trained to operate as an AND gate
+- model_4x2_mlp - FeedForward Neural Network (1-1-1) trained to learn the output of equation 4x2
+- model_x2_mlp - FNN (1-1-1) trained to learn the equation y = 2x
+- model_x2plus1_mlp - FNN (1-1-1) trained to learn the equation y = 2x + 1
+- model_XOR - FNN modelling the XOR function
+- model_2dout - FNN, outputing a 2d vector
+- mnist_train - Train a FNN on the MNIST dataset
+- mnist_test - Inference on a FNN for the MNIST dataset
+
+
+
+# ./main mnist_test
+
+[ DETAILS ]
+Model: mnist_test
+Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.
+Architecture: 748 Input Nodes, 40 Hidden Nodes, 10 Output Nodes.
+Hidden Activation: ReLU, Output Activation: ReLU
+Loss Function: Mean Squared Error + Gradient Descent + Back Propagation 
+
+Testing Size (n): 10000
+
+
+[ LOADING WEIGHTS ]
+Loading Model Weights from weights.bin
+
+
+[ PREDICTION RESULTS ]
+Testing set size: 10000
+Success count: 8579
+Success rate: 85.79%
+
+
+
+# ./main model_x_gt_9
 
 [ DETAILS ]
 Model: model_x_gt_9
@@ -62,7 +125,8 @@ Starting prediction test from x = -15 to 15
 [ 29/30 SUCCESS ]: Input:  13 Expected:  1 Prediction:  1
 [ 30/30 SUCCESS ]: Input:  14 Expected:  1 Prediction:  1
 
-# ./build.sh && ./main model_linear
+
+# ./main model_linear
 
 [ DETAILS ]
 Model: model_linear

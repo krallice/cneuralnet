@@ -792,15 +792,15 @@ ModelMapping modelMappings[] = {
     {"model_linear", "A two dimensional input perceptron, trained to model y = x/2 + 5", model_linear},
     {"model_AND", "A two dimensional input perceptron, trained to operate as an AND gate", model_AND},
     // Deep Neural Networks, Single Output:
-    {"model_4x2_mlp", "1 hidden, 1 output, trained to learn the output of equation 4x2", model_4x2_mlp},
-    {"model_x2_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x", model_x2_mlp},
-    {"model_x2plus1_mlp", "1 hidden, 1 output, trained to learn the equation y = 2x + 1", model_x2plus1_mlp},
-    {"model_XOR", "A multi-layer perceptron, modelling the XOR function", model_XOR},
+    {"model_4x2_mlp", "FeedForward Neural Network (1-1-1) trained to learn the output of equation 4x2", model_4x2_mlp},
+    {"model_x2_mlp", "FNN (1-1-1) trained to learn the equation y = 2x", model_x2_mlp},
+    {"model_x2plus1_mlp", "FNN (1-1-1) trained to learn the equation y = 2x + 1", model_x2plus1_mlp},
+    {"model_XOR", "FNN modelling the XOR function", model_XOR},
     // Deep Neural Networks, Multiple Output:
-    {"model_2dout", "A multi-layer perceptron, outputing a 2d vector", model_2dout},
+    {"model_2dout", "FNN, outputing a 2d vector", model_2dout},
     // Realworld Dataset:
-    {"mnist_train", "Train a 784-15-10 NN on the MNIST dataset", mnist_train},
-    {"mnist_test", "Test a 784-15-10 NN on the MNIST dataset", mnist_test}
+    {"mnist_train", "Train a FNN on the MNIST dataset", mnist_train},
+    {"mnist_test", "Inference on a FNN for the MNIST dataset", mnist_test}
     
 };
 
