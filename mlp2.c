@@ -69,6 +69,7 @@ void destroy_mlp2(multilayer_perceptron2_t *mlp) {
 
 void mlp2_feedforward(multilayer_perceptron2_t *mlp, const double training_features[mlp->input_count]) {
 
+    // Feedforward the activations through the network:
     for (int k = 0; k < mlp->p_hidden1_count; k++) {
         mlp->p_hidden1_output[k] = perceptron_feedforward(mlp->p_hidden1[k], training_features);
     }
@@ -87,6 +88,10 @@ void mlp2_backpropagate(multilayer_perceptron2_t *mlp, const double training_fea
     double output_dLdz[mlp->p_output_count];
     double hidden2_dLdz[mlp->p_hidden2_count];
     double hidden1_dLdz[mlp->p_hidden1_count];
+
+    // Please see mlp.c for the backpropagation/gradient descent equations
+
+    // Stage 1. Calculate the gradient of the loss function with respect to z (the pre-activated output of the node):
 
     for (int k = 0; k < mlp->p_output_count; k++) {
         output_dLdz[k] = (mlp->p_output_output[k] - training_labels[k]) * mlp->p_output[k]->derivative_activation_function(mlp->p_output_output[k]);
@@ -108,6 +113,9 @@ void mlp2_backpropagate(multilayer_perceptron2_t *mlp, const double training_fea
         hidden1_dLdz[k] *= mlp->p_hidden1[k]->derivative_activation_function(mlp->p_hidden1_output[k]);
     }
 
+    // Stage 2. Calculate the gradient of the loss function with respect to w (the input weight),
+    // and update the weights using the update rule (gradient descent): w ← w - (α * (dL/dw))
+    
     for (int k = 0; k < mlp->p_output_count; k++) {
         for (int j = 0; j < mlp->p_hidden2_count; j++) {
             mlp->p_output[k]->weights[j] -= learning_rate * (mlp->p_hidden2_output[j] * output_dLdz[k]);

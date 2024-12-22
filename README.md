@@ -12,13 +12,24 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 
 - Rosenblatt Perceptron
 - Feed Forward Neural Network (1 Hidden Layer)
-- *TODO:* Feed Forward Neural Network (2 Hidden Layers)
+- Feed Forward Neural Network (2 Hidden Layers)
 
 **Learning Methods**
 
 - Stochastic Gradient Descent
 - *TODO: Mini-Batch Gradient Descent*
 - *TODO: Batch Gradient Descent*
+
+**Activation Functions**
+
+- Linear
+- ReLU
+- Leaky ReLU
+- Sigmoid
+
+**Weight Initialisation**
+
+- Random (Uniform Distribution)
 
 ## Models Implemented
 
@@ -37,33 +48,33 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 - mnist_test - Inference on a FNN for the MNIST dataset
 
 **Feed Forward Neural Network (2 Hidden Layers)**
-- model_x2plus1_2fnn - 2 Hidden Layer FNN (1-2-2-1) trained to learn the equation ```y = 2x + 1```
+- model_x2plus1_2fnn - 2 Hidden Layer FNN (1-8-8-1) trained to learn the equation ```y = 2x + 1```
 - mnist2_train - Train a FNN on the MNIST dataset
 - mnist2_test - Inference on a FNN for the MNIST dataset
 
 ## Usage Example Dump
 
 ```
-# ./main mnist_test
+# ./main mnist2_test
 
 [ DETAILS ]
-Model: mnist_test
+Model: mnist2_test
 Aim: Test a feed forward neural network on previously unseen MNIST dataset handwritten digits.
-Architecture: 748 Input Nodes, 40 Hidden Nodes, 10 Output Nodes.
-Hidden Activation: ReLU, Output Activation: ReLU
+Architecture: 784 Input Nodes, 128 Hidden1 Nodes, 64 Hidden2 Nodes, 10 Output Nodes.
+Hidden Activation: Leaky ReLU, Output Activation: Leaky ReLU
 Loss Function: Mean Squared Error + Gradient Descent + Back Propagation 
 
 Testing Size (n): 10000
 
 
 [ LOADING WEIGHTS ]
-Loading Model Weights from weights.bin
+Loading Model Weights from weights2.bin
 
 
 [ PREDICTION RESULTS ]
 Testing set size: 10000
-Success count: 8579
-Success rate: 85.79%
+Success count: 9470
+Success rate: 94.70%
 
 
 
