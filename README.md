@@ -37,7 +37,7 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 - mnist_test - Inference on a FNN for the MNIST dataset
 
 **Feed Forward Neural Network (2 Hidden Layers)**
-- model_x2plus1_2fnn - 2 Layer FNN (1-1-1-1) trained to learn the equation ```y = 2x + 1```
+- model_x2plus1_2fnn - 2 Hidden Layer FNN (1-2-2-1) trained to learn the equation ```y = 2x + 1```
 - mnist2_train - Train a FNN on the MNIST dataset
 - mnist2_test - Inference on a FNN for the MNIST dataset
 
