@@ -2,7 +2,7 @@
 
 This project is an attempt to document my understanding of the logic and mathematics behind neural networks, and potentially other ML techniques. To truly root my understanding of these systems, I've embarked upon the challenge to build/model them in C, using no external libraries like numpy or scikit. 
 
-I've commited to only writing code if I can explain its reason for existing - no blindly copying or translating source code from other already written sources. The code is often written consulting the maths behind the algorithms, and I've taken lengths to ensure the code is adequately documented, including my thoughts as I go along.
+I've commited to only writing code if I can explain its reason for existing - no blindly copying or translating source code from other already written sources. The code is often written consulting the maths behind the algorithms, and I've taken lengths to ensure the code is adequately documented, including my thoughts as I go along. If I cannot explain the reason for a line of code, I don't write it until i can.
 
 I started this project with the intent to remove the "magic" from deep learning, however as I've come to understand it, and the maths behind how deep learning models operate, I've only come to see them as more impressive and magic.
 
