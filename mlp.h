@@ -29,8 +29,6 @@ typedef struct multilayer_perceptron_t {
     
 } multilayer_perceptron_t;
 
-double step_function(double x);
-
 multilayer_perceptron_t *init_mlp(int p_input_count, int p_hidden1_count, int p_output_count, 
     double (*hidden1_activation_function)(double), double (*hidden1_derivative_activation_function)(double), 
     double (*output_activation_function)(double),  double (*output_derivative_activation_function)(double), int epoch_count);
