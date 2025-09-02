@@ -2,17 +2,17 @@
 
 This project is an attempt to document my understanding of the logic and mathematics behind neural networks, and potentially other ML techniques. To truly root my understanding of these systems, I've embarked upon the challenge to build/model them in C, using no external libraries like numpy or scikit. 
 
-I've commited to only writing code if I can explain its reason for existing - no blindly copying or translating source code from other already written sources. The code is often written consulting the maths behind the algorithms, and I've taken lengths to ensure the code is adequately documented, including my thoughts as I go along. If I cannot explain the reason for a line of code, I don't write it until i can.
+I've commited to only writing code if I can explain its reason for existing - no blindly copying or translating source code from other already written sources. The code is often written consulting the maths behind the algorithms, and I've taken lengths to ensure the code is adequately documented, including my thoughts as I go along. If I cannot explain the reason for a line of code, I don't write it until I can.
 
 I started this project with the intent to remove the "magic" from deep learning, however as I've come to understand it, and the maths behind how deep learning models operate, I've only come to see them as more impressive and magic.
 
-The aim isnt to build performant or perfect code. This is a live documentation of my learning processing.
+The aim isnt to build performant or perfect code. This is a live documentation of my learning process.
 
 **Architectures**
 
 - Rosenblatt Perceptron
-- Feed Forward Neural Network (1 Hidden Layer)
-- Feed Forward Neural Network (2 Hidden Layers)
+- Feed Forward Neural Network (1 Hidden Layer) (Mean Squared Error Loss Function)
+- Feed Forward Neural Network (2 Hidden Layers) (Mean Squared Error Loss Function)
 
 **Learning Methods**
 
@@ -22,14 +22,20 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 
 **Activation Functions**
 
-- Linear
-- ReLU
-- Leaky ReLU
-- Sigmoid
+- FeedForward Regressions:
+  - Linear
+  - ReLU
+  - Leaky ReLU
+  - Sigmoid
 
 **Weight Initialisation**
 
 - Random (Uniform Distribution)
+
+## Todo
+
+- Implement SoftMax + Cross Entropy Loss (Categorial), and upgrade the mnist predictors to use this
+- Convolution, perhaps simply?
 
 ## Models Implemented
 
@@ -38,7 +44,7 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 - model_linear - A two dimensional input perceptron, trained to model ```y = x/2 + 5```
 - model_AND - A two dimensional input perceptron, trained to operate as an ```AND``` gate
 
-**Feed Forward Neural Network (1 Hidden Layer)**
+**Feed Forward Neural Network (1 Hidden Layer) (MSE Loss Function)**
 - model_4x2_mlp - FeedForward Neural Network (1-1-1) trained to learn the output of equation ```4 x 2```
 - model_x2_mlp - FNN (1-1-1) trained to learn the equation ```y = 2x```
 - model_x2plus1_mlp - FNN (1-1-1) trained to learn the equation ```y = 2x + 1```
@@ -47,7 +53,7 @@ The aim isnt to build performant or perfect code. This is a live documentation o
 - mnist_train - Train a FNN on the MNIST dataset
 - mnist_test - Inference on a FNN for the MNIST dataset
 
-**Feed Forward Neural Network (2 Hidden Layers)**
+**Feed Forward Neural Network (2 Hidden Layers) (MSE Loss Function)**
 - model_x2plus1_2fnn - 2 Hidden Layer FNN (1-8-8-1) trained to learn the equation ```y = 2x + 1```
 - mnist2_train - Train a FNN on the MNIST dataset
 - mnist2_test - Inference on a FNN for the MNIST dataset
